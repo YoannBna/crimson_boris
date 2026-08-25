@@ -1,0 +1,32 @@
+# Artefacts d'extraction a la racine — `asar extract-file` ecrit dans le
+# repertoire courant, et un bundle ainsi tombe la n'a rien a faire ici.
+/index.html
+/index-*.js
+/*.asar
+
+# Dependances et compilation
+node_modules/
+out/
+dist/
+*.tsbuildinfo
+
+# Systeme
+.DS_Store
+*.log
+
+# Archive de la version 1 : document de travail personnel, jamais du code
+legacy/
+
+# Donnees locales de l'operateur — ne doivent jamais partir sur un depot
+boris.private.json
+.env
+.env.local
+*.pem
+*.p12
+*.keystore
+decks/*.txt
+decks/*.dec
+!decks/README.md
+
+# Journaux de lancement
+CrimsonBoris-launch.log

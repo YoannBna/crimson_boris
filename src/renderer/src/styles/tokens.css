@@ -1,0 +1,66 @@
+/* ============================================================
+   CRIMSON BORIS — DESIGN SYSTEM v2
+   Dark Fantasy Technologique — palette abyssale
+   ============================================================ */
+:root {
+  /* --- SUBSTRAT ------------------------------------------- */
+  --abyss:      #121010;   /* fond principal, gris-brun abyssal */
+  --abyss-deep: #0c0a0a;   /* creux, puits, arriere-plans      */
+  --panel:      #1a1616;   /* surface carte                    */
+  --panel-2:    #201a1a;   /* surface carte, bas de degrade    */
+  --panel-hi:   #2a2020;   /* survol, surface elevee           */
+
+  /* --- ENCRE ---------------------------------------------- */
+  --text:  #F8F8F8;        /* texte principal — 17:1 sur abyss */
+  --ash:   #A79B95;        /* texte secondaire — 7.3:1         */
+  --ash-2: #7D716B;        /* labels, capitales espacees       */
+
+  /* --- SANG ----------------------------------------------- */
+  --blood:      #C81E2D;   /* remplissages, bordures, barres   */
+  --blood-hi:   #E63946;
+  --blood-txt:  #FF5C6B;   /* texte rouge sur fond sombre      */
+  --blood-veil: rgba(200, 30, 45, .13);
+  --blood-edge: rgba(200, 30, 45, .30);
+
+  /* --- BRAISE --------------------------------------------- */
+  --ember:      #E8590C;
+  --ember-hi:   #FF7A2F;
+  --ember-txt:  #FF8A3D;
+  --ember-veil: rgba(232, 89, 12, .13);
+  --ember-edge: rgba(232, 89, 12, .34);
+
+  /* --- POURPRE (mystique / strategique) ------------------- */
+  --purple:      #6B2D5C;
+  --purple-hi:   #9B4D8C;
+  --purple-txt:  #C77DB8;
+  --purple-veil: rgba(107, 45, 92, .20);
+  --purple-edge: rgba(155, 77, 140, .32);
+
+  /* --- JADE (statuts positifs / finance en hausse) -------- */
+  --jade:      #1F7A4D;
+  --jade-hi:   #2AA468;
+  --jade-txt:  #35C77B;
+  --jade-veil: rgba(31, 122, 77, .16);
+  --jade-edge: rgba(53, 199, 123, .32);
+
+  /* --- STRUCTURE ------------------------------------------ */
+  --line: rgba(200, 30, 45, .28);
+  --hair: rgba(248, 248, 248, .075);
+  --hair-2: rgba(248, 248, 248, .13);
+
+  /* --- SCEAU : le degre du systeme ------------------------ */
+  --sigil: linear-gradient(90deg,
+    var(--purple) 0%, var(--blood) 28%, var(--ember-hi) 55%,
+    var(--blood-hi) 78%, var(--purple-hi) 100%);
+  --sigil-soft: linear-gradient(90deg, var(--blood), var(--ember-hi));
+  /* Titre : demarre clair — un pourpre sombre en tete rend le "C" illisible. */
+  --sigil-title: linear-gradient(90deg,
+    var(--blood-hi) 0%, var(--ember-hi) 42%, #FFB37A 60%,
+    var(--purple-hi) 88%, var(--purple-txt) 100%);
+  --sigil-jade: linear-gradient(90deg, var(--jade), var(--jade-hi));
+
+  /* --- METRIQUE ------------------------------------------- */
+  --mono: "SF Mono", ui-monospace, "JetBrains Mono", Menlo, Consolas, monospace;
+  --shadow-card: 0 1px 0 rgba(248,248,248,.03), 0 8px 24px rgba(0,0,0,.45);
+  --glow-blood: 0 0 10px rgba(230, 57, 70, .55);
+}

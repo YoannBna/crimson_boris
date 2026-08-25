@@ -1,0 +1,91 @@
+# ============================================================
+# Empaquetage de Crimson Boris
+# Produit une application macOS autonome, lancable au Finder,
+# sans passer par npm.
+# ============================================================
+appId: fr.crimson.boris
+productName: Crimson Boris
+copyright: © 2026 Crimson Boris
+
+directories:
+  buildResources: build
+  output: dist
+
+# Seul le resultat de compilation part dans l'application ;
+# les sources et les cartes de debogage restent en dehors.
+files:
+  - out/**
+  - package.json
+  - '!**/*.map'
+  - '!**/{.DS_Store,.git,.gitignore}'
+
+# better-sqlite3 embarque un binaire natif : il ne peut pas etre
+# lu depuis l'archive asar, il doit rester sur le disque.
+asarUnpack:
+  - '**/*.node'
+
+# Aucune recompilation native.
+# better-sqlite3 livre des prebuilds N-API — ABI-stables, donc valables
+# pour toute version d'Electron — pour darwin, win32 et linux. Laisser
+# @electron/rebuild s'en charger le fait echouer des qu'on empaquete pour
+# une architecture autre que celle de la machine :
+#   « node-gyp does not support cross-compiling native modules from source »
+# C'est ce qui bloquait toute production d'un installeur Windows depuis
+# un Mac. Les binaires prets a l'emploi rendent l'etape superflue.
+npmRebuild: false
+
+mac:
+  category: public.app-category.finance
+  icon: build/icon.icns
+  darkModeSupport: true
+  # Aucun certificat de developpeur Apple : l'application n'est ni
+  # signee ni notarisee. macOS demandera une confirmation au premier
+  # lancement — voir la section « Premier lancement » du README.
+  identity: null
+  target:
+    - target: dmg
+      arch: [arm64]
+    - target: dir
+      arch: [arm64]
+
+# --- Publication : GitHub Releases -------------------------
+# `owner` et `repo` restent a renseigner : sans eux, electron-updater
+# n'a aucun endroit ou chercher. Rien n'est publie automatiquement —
+# `npm run release` le fait explicitement.
+publish:
+  provider: github
+  owner: YoannBna
+  repo: crimson_boris
+  releaseType: release
+
+win:
+  icon: build/icon.png
+  target:
+    - target: nsis
+      arch: [x64, arm64]
+  # Application non signee : SmartScreen affichera un avertissement au
+  # premier lancement. La mise a jour automatique fonctionne malgre tout,
+  # contrairement a macOS.
+  signAndEditExecutable: true
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Crimson Boris
+  # Sans cela, l'installeur silencieux d'electron-updater ne saurait pas
+  # remplacer la version en place.
+  differentialPackage: true
+
+dmg:
+  title: Crimson Boris
+  contents:
+    - x: 140
+      y: 200
+      type: file
+    - x: 400
+      y: 200
+      type: link
+      path: /Applications

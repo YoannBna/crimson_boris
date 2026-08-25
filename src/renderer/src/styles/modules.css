@@ -1,0 +1,472 @@
+/* ============================================================
+   Styles specifiques aux modules 01 -> 04
+   ============================================================ */
+
+/* ---------- 01 · SCENARIOS ---------- */
+.scn {
+  border: 1px solid var(--hair-2); background: var(--abyss-deep);
+  padding: 11px 13px; margin-bottom: 10px; position: relative;
+}
+.scn:last-child { margin-bottom: 0 }
+.scn.pinned { border-color: var(--blood); box-shadow: inset 0 0 0 1px var(--blood-veil) }
+.scn-h { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; margin-bottom: 6px }
+.scn-id { font-size: 10px; font-weight: 700; letter-spacing: .16em; color: var(--ember-txt) }
+.scn-t { font-weight: 700; font-size: 12.5px; flex: 1; min-width: 180px; color: var(--text) }
+.prob { font-size: 9px; letter-spacing: .12em; font-weight: 700; padding: 1px 7px; border: 1px solid }
+.p-hi { color: #fff; background: var(--blood); border-color: var(--blood-hi) }
+.p-md { color: var(--ember-txt); background: var(--ember-veil); border-color: var(--ember-edge) }
+.p-lo { color: var(--ash); background: rgba(248,248,248,.05); border-color: var(--hair-2) }
+.p-own { color: var(--purple-txt); background: var(--purple-veil); border-color: var(--purple-edge) }
+.scn-b { font-size: 11.5px; color: var(--ash); line-height: 1.55; margin-bottom: 7px }
+.scn-b b { color: var(--blood-txt) }
+.imp { display: flex; gap: 6px; flex-wrap: wrap }
+.imp span {
+  font-size: 10px; padding: 2px 7px; border: 1px solid var(--hair);
+  background: var(--panel); letter-spacing: .04em; color: var(--ash);
+}
+.imp .i-neg { border-color: var(--blood-edge); color: var(--blood-txt) }
+.imp .i-pos { border-color: var(--jade-edge); color: var(--jade-txt) }
+.imp .i-neu { color: var(--ash) }
+
+/* ---------- 02 · ETF ---------- */
+.etf { padding: 10px 0; border-bottom: 1px solid var(--hair) }
+.etf:last-child { border-bottom: none }
+.etf-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; gap: 10px }
+.etf-name { font-weight: 700; font-size: 12px; color: var(--text) }
+.etf-sig { font-size: 10px; letter-spacing: .12em; font-weight: 700 }
+.etf-sig.s-hold { color: var(--purple-txt) }
+.etf-sig.s-asym { color: var(--ember-txt) }
+.etf-sig.s-rot  { color: var(--blood-txt) }
+.bar { height: 7px; background: var(--abyss-deep); position: relative; overflow: hidden; border-radius: 2px; border: 1px solid var(--hair) }
+.bar span { position: absolute; left: 0; top: 0; bottom: 0; background: var(--sigil-soft) }
+.etf-d { font-size: 11px; color: var(--ash); margin-top: 6px }
+
+/* ---------- 03 · COURRIER ---------- */
+.mail { padding: 11px 0; border-bottom: 1px solid var(--hair) }
+.mail:last-child { border-bottom: none }
+.mail-h { display: flex; gap: 11px; align-items: flex-start }
+.score {
+  flex: 0 0 46px; text-align: center; border: 1px solid; padding: 3px 0;
+  font-weight: 700; font-size: 15px; line-height: 1.1;
+}
+.score small { display: block; font-size: 7px; letter-spacing: .12em; font-weight: 700; opacity: .78 }
+.s-hi { color: #fff; background: var(--blood); border-color: var(--blood-hi) }
+.s-md { color: var(--ember-txt); background: var(--ember-veil); border-color: var(--ember-edge) }
+.s-lo { color: var(--ash); background: rgba(248,248,248,.05); border-color: var(--hair-2) }
+.mail-b { flex: 1; min-width: 0 }
+.mail-s { font-size: 12.5px; font-weight: 700; color: var(--text) }
+.mail-f { color: var(--ash-2); font-size: 11px; margin-top: 2px }
+.mail-x { color: var(--ash); font-size: 11px; margin-top: 5px; line-height: 1.5 }
+.mail-x b { color: var(--blood-txt); font-weight: 700 }
+
+.reply { margin-top: 9px; border: 1px solid var(--ember-edge); background: var(--abyss-deep) }
+.reply-h {
+  display: flex; align-items: center; gap: 9px; padding: 5px 9px;
+  background: var(--ember-veil); font-size: 9px; letter-spacing: .16em;
+  font-weight: 700; color: var(--ember-txt); text-transform: uppercase;
+}
+.reply-h .btn { margin-left: auto }
+.reply pre {
+  padding: 9px 11px; font: inherit; font-size: 11px; color: var(--ash);
+  white-space: pre-wrap; line-height: 1.55; max-height: 190px; overflow: auto;
+}
+
+/* ---------- 03 · TACHES ---------- */
+.task { display: flex; gap: 10px; align-items: flex-start; padding: 9px 0; border-bottom: 1px solid var(--hair) }
+.task:last-child { border-bottom: none }
+.task input { margin-top: 4px; accent-color: var(--blood-hi); width: 14px; height: 14px; cursor: pointer }
+.task label { flex: 1; cursor: pointer; font-size: 12px; font-weight: 700; color: var(--text) }
+.task .sub2 { display: block; font-weight: 400; color: var(--ash); font-size: 11px; margin-top: 2px }
+.task.done label { text-decoration: line-through; opacity: .42 }
+.due { font-size: 9px; letter-spacing: .1em; font-weight: 700; padding: 2px 7px; border: 1px solid; white-space: nowrap }
+.due-now  { color: #fff; background: var(--blood); border-color: var(--blood-hi) }
+.due-soon { color: var(--ember-txt); background: var(--ember-veil); border-color: var(--ember-edge) }
+.due-far  { color: var(--ash); background: rgba(248,248,248,.05); border-color: var(--hair-2) }
+
+/* ---------- 04 · MTG ---------- */
+.kpi { display: grid; gap: 9px; grid-template-columns: repeat(auto-fit, minmax(132px, 1fr)); margin-bottom: 4px }
+.kpi > div { border: 1px solid var(--hair-2); background: var(--abyss-deep); padding: 9px 11px }
+.kpi b { display: block; font-size: 9px; letter-spacing: .16em; color: var(--ash-2); font-weight: 700; margin-bottom: 4px }
+.kpi span { font-size: 19px; font-weight: 700; color: var(--blood-txt); font-variant-numeric: tabular-nums }
+.kpi span.ok { color: var(--jade-txt) }
+.kpi i { font-style: normal; font-size: 10px; color: var(--ash); display: block; margin-top: 2px; letter-spacing: .06em }
+
+.dist { margin-top: 4px }
+.drow { display: grid; grid-template-columns: 118px 1fr 34px; gap: 9px; align-items: center; padding: 3px 0 }
+.dlab { font-size: 11px; font-weight: 700; color: var(--text) }
+.dbar { height: 11px; background: var(--abyss-deep); position: relative; overflow: hidden; border-radius: 2px; border: 1px solid var(--hair) }
+.dbar > span { position: absolute; left: 0; top: 0; bottom: 0; background: var(--sigil-soft) }
+.dbar.land > span { background: linear-gradient(90deg, var(--purple), var(--purple-hi)) }
+.dval { font-size: 11px; text-align: right; font-weight: 700; color: var(--ash); font-variant-numeric: tabular-nums }
+
+.key { padding: 9px 0; border-bottom: 1px solid var(--hair) }
+.key:last-child { border-bottom: none }
+.key-h { display: flex; gap: 9px; align-items: baseline; flex-wrap: wrap }
+.key-r {
+  font-size: 9px; letter-spacing: .14em; font-weight: 700; padding: 1px 7px;
+  border: 1px solid; text-transform: uppercase; white-space: nowrap;
+}
+.r-core { color: #fff; background: var(--blood); border-color: var(--blood-hi) }
+.r-eng  { color: var(--ember-txt); background: var(--ember-veil); border-color: var(--ember-edge) }
+.r-win  { color: var(--purple-txt); background: var(--purple-veil); border-color: var(--purple-edge) }
+.key-n { font-weight: 700; font-size: 12.5px; color: var(--text) }
+.key-d { font-size: 11.5px; color: var(--ash); margin-top: 4px; line-height: 1.55 }
+.key-d b { color: var(--blood-txt) }
+
+/* ---------- 04 · BANC D'ESSAI ---------- */
+.import-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 4px }
+.hint { font-size: 11px; color: var(--ash); flex: 1; min-width: 240px; line-height: 1.55 }
+
+.standby {
+  text-align: center; padding: 26px 18px;
+  border: 1px dashed var(--ember-edge); background: var(--abyss-deep); margin-top: 12px;
+}
+.standby .g { font-size: 30px; color: var(--ember-txt); letter-spacing: .1em }
+.standby .m { margin-top: 9px; font-size: 12px; font-weight: 700; letter-spacing: .14em; color: var(--blood-txt) }
+.standby .s {
+  margin-top: 7px; font-size: 11.5px; color: var(--ash); line-height: 1.6;
+  max-width: 640px; margin-left: auto; margin-right: auto;
+}
+.standby .s b { color: var(--ember-txt) }
+
+.sim-form { display: flex; gap: 14px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 4px }
+.sim-form label { display: flex; flex-direction: column; gap: 4px }
+.sim-form span { font-size: 9px; letter-spacing: .16em; color: var(--ash-2); font-weight: 700; text-transform: uppercase }
+.sim-form select, .sim-form input {
+  font: inherit; font-size: 12px; background: var(--abyss-deep); color: var(--text);
+  border: 1px solid var(--hair-2); padding: 5px 8px; min-width: 130px;
+}
+.sim-form select:focus, .sim-form input:focus { outline: none; border-color: var(--blood) }
+
+.run-meta {
+  display: flex; gap: 18px; flex-wrap: wrap; font-size: 11px; color: var(--ash-2);
+  letter-spacing: .08em; padding-bottom: 10px; border-bottom: 1px solid var(--hair); margin-bottom: 12px;
+}
+.run-meta b { color: var(--ember-txt) }
+
+/* ---------- 04 · CONSTATS ---------- */
+.finding { border-left: 3px solid var(--hair-2); padding: 10px 0 10px 13px; margin-bottom: 12px }
+.finding:last-of-type { margin-bottom: 4px }
+.finding.g-crit { border-left-color: var(--blood) }
+.finding.g-hot  { border-left-color: var(--ember) }
+.finding.g-warm { border-left-color: var(--purple-hi) }
+.finding.g-ok   { border-left-color: var(--jade) }
+
+.finding-h { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; margin-bottom: 5px }
+.finding-g {
+  font-size: 9px; letter-spacing: .14em; font-weight: 700; text-transform: uppercase;
+  padding: 1px 7px; border: 1px solid;
+}
+.g-crit .finding-g { color: #fff; background: var(--blood); border-color: var(--blood-hi) }
+.g-hot  .finding-g { color: var(--ember-txt); background: var(--ember-veil); border-color: var(--ember-edge) }
+.g-warm .finding-g { color: var(--purple-txt); background: var(--purple-veil); border-color: var(--purple-edge) }
+.g-ok   .finding-g { color: var(--jade-txt); background: var(--jade-veil); border-color: var(--jade-edge) }
+.finding-t { font-weight: 700; font-size: 13px; color: var(--text) }
+.finding-m { font-size: 11.5px; color: var(--text); font-variant-numeric: tabular-nums; margin-bottom: 4px }
+.finding-r { font-size: 11.5px; color: var(--ash); line-height: 1.55 }
+
+/* ---------- 04 · SUGGESTIONS ---------- */
+.sugg { margin-top: 11px; display: grid; gap: 7px }
+.sugg-row {
+  display: flex; gap: 11px; align-items: center;
+  background: var(--abyss-deep); border: 1px solid var(--hair); padding: 7px 10px;
+}
+.sugg-img { width: 40px; border-radius: 3px; flex: 0 0 auto }
+.sugg-b { flex: 1; min-width: 0 }
+.sugg-n { font-weight: 700; font-size: 12.5px; color: var(--text) }
+.sugg-cost { color: var(--ember-txt); font-size: 11px; margin-left: 8px; letter-spacing: .04em }
+.sugg-t { font-size: 11px; color: var(--ash-2); margin-top: 1px }
+.sugg-w { font-size: 11px; color: var(--ash); margin-top: 3px }
+.sugg-p { text-align: right; flex: 0 0 auto }
+.sugg-p b { display: block; color: var(--jade-txt); font-size: 13px; font-variant-numeric: tabular-nums }
+.sugg-p i { font-style: normal; font-size: 9px; color: var(--ash-2); letter-spacing: .1em }
+
+/* ---------- 04 · VARIANTES GRAPHIQUES ---------- */
+.style-block { padding: 12px 0; border-bottom: 1px solid var(--hair) }
+.style-block:last-of-type { border-bottom: none }
+.style-h { display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; margin-bottom: 9px }
+.style-n { font-weight: 700; font-size: 13px; color: var(--text) }
+.style-c { font-size: 11px; color: var(--ash-2) }
+.style-grid { display: grid; gap: 11px; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) }
+.print { background: var(--abyss-deep); border: 1px solid var(--hair); padding: 8px }
+.print-img { width: 100%; border-radius: 5px; display: block }
+.print-meta { display: flex; flex-direction: column; gap: 2px; margin-top: 7px }
+.print-meta b { color: var(--jade-txt); font-size: 13px; font-variant-numeric: tabular-nums }
+.print-set { font-size: 10px; color: var(--ash-2); letter-spacing: .1em }
+.print-fx { font-size: 10.5px; color: var(--ember-txt) }
+.print-artist { font-size: 10px; color: var(--ash-2); font-style: italic }
+
+/* ---------- 02 · ASYMETRIES RADICALES ---------- */
+.asym-bar {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding-bottom: 9px; margin-bottom: 10px; border-bottom: 1px solid var(--hair);
+}
+.asym-count { font-size: 11px; color: var(--ash-2); letter-spacing: .08em }
+.asym-count b { color: var(--ember-txt) }
+.asym-sort { margin-left: auto; display: flex; gap: 5px }
+.asym-tab {
+  font: inherit; font-size: 9px; letter-spacing: .12em; font-weight: 700;
+  text-transform: uppercase; cursor: pointer; padding: 3px 9px;
+  background: transparent; color: var(--ash-2);
+  border: 1px solid var(--hair-2); transition: all .15s ease;
+}
+.asym-tab:hover { color: var(--text); background: var(--panel-hi) }
+.asym-tab.on { color: #fff; background: var(--blood); border-color: var(--blood-hi) }
+
+/* Defilement interne : le volet garde une hauteur bornee quoi qu'il contienne. */
+.asym-scroll {
+  max-height: 520px; overflow-y: auto; overflow-x: hidden;
+  padding-right: 6px; display: grid; gap: 6px;
+}
+
+.asym {
+  background: var(--abyss-deep);
+  border: 1px solid var(--hair);
+  border-left: 3px solid var(--blood);
+  transition: border-color .15s ease, background .15s ease;
+}
+.asym:hover { background: #171212 }
+.asym.open { border-color: var(--blood-edge); border-left-color: var(--blood-hi) }
+
+/* Chaque axe porte sa teinte : reperage sans legende. */
+.asym.ax-calcul        { border-left-color: var(--ember) }
+.asym.ax-lithographie  { border-left-color: var(--ember-hi) }
+.asym.ax-fonderie      { border-left-color: var(--blood-hi) }
+.asym.ax-memoire       { border-left-color: var(--blood) }
+.asym.ax-quantique     { border-left-color: var(--purple-hi) }
+.asym.ax-energie       { border-left-color: var(--jade) }
+.asym.ax-defense       { border-left-color: #8B1A1A }
+.asym.ax-robotique     { border-left-color: var(--purple) }
+.asym.ax-matieres      { border-left-color: #A0522D }
+
+/* Flex plutot que grid : le groupe ticker-nom-axe reste soude a gauche,
+ * et les chiffres se collent a droite quelle que soit la largeur. */
+.asym-h {
+  display: flex; align-items: baseline; gap: 10px; width: 100%;
+  font: inherit; text-align: left; cursor: pointer;
+  background: transparent; border: none; padding: 8px 11px 6px;
+}
+.asym-tick { flex: 0 0 56px }
+.asym-name { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.asym-axis { margin-right: auto }
+.asym-price { flex: 0 0 96px }
+.asym-var { flex: 0 0 76px }
+.asym-chev { flex: 0 0 16px }
+.asym-tick {
+  font-size: 11px; font-weight: 700; color: var(--blood-txt); letter-spacing: .06em;
+}
+.asym-name { font-size: 12.5px; font-weight: 700; color: var(--text) }
+.asym-axis {
+  font-size: 8.5px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--ash-2); border: 1px solid var(--hair-2); padding: 1px 6px;
+  white-space: nowrap; align-self: center;
+}
+.asym-price {
+  font-size: 12px; text-align: right; color: var(--text);
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.asym-var {
+  font-size: 12px; text-align: right; font-weight: 700;
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.asym-chev { color: var(--ash-2); font-size: 13px; text-align: center; line-height: 1 }
+.asym.open .asym-chev { color: var(--blood-txt) }
+
+.asym-b { padding: 0 11px 9px }
+.asym-rupture { font-size: 11px; color: var(--ash); line-height: 1.5 }
+
+.asym-dl {
+  margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--hair-2);
+  display: grid; grid-template-columns: 118px 1fr; gap: 4px 12px;
+}
+.asym-dl dt {
+  font-size: 8.5px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--ember-txt); font-weight: 700; padding-top: 2px;
+}
+.asym-dl dd { font-size: 11px; color: var(--ash); line-height: 1.5 }
+.asym-dl dd.asym-risk { color: var(--blood-txt) }
+
+@media (max-width: 900px) {
+  .asym-axis, .asym-price { display: none }
+  .asym-name { margin-right: auto }
+  .asym-dl { grid-template-columns: 1fr }
+}
+
+.import-path {
+  margin-top: 9px; font-size: 10.5px; color: var(--ash-2); letter-spacing: .04em;
+}
+.import-path code {
+  font: inherit; color: var(--ember-txt); background: var(--abyss-deep);
+  border: 1px solid var(--hair); padding: 1px 6px; word-break: break-all;
+}
+
+/* ============================================================
+   04 · FORGE MTG
+   ============================================================ */
+
+.forge-tabs { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap }
+.forge-tab {
+  font: inherit; cursor: pointer; text-align: left;
+  background: var(--abyss-deep); color: var(--ash);
+  border: 1px solid var(--hair-2); border-bottom: 2px solid transparent;
+  padding: 7px 14px; transition: all .15s ease;
+}
+.forge-tab:hover { background: var(--panel-hi); color: var(--text) }
+.forge-tab.on {
+  color: var(--text); background: var(--blood-veil);
+  border-color: var(--blood-edge); border-bottom-color: var(--blood);
+}
+.forge-tab { font-size: 10px; letter-spacing: .18em; font-weight: 700 }
+.forge-tab-h {
+  display: block; font-size: 9px; letter-spacing: .06em; font-weight: 400;
+  color: var(--ash-2); text-transform: none; margin-top: 2px;
+}
+.forge-tab.on .forge-tab-h { color: var(--ember-txt) }
+
+/* ---------- Etabli ---------- */
+.bench-head {
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  padding-bottom: 9px; margin-bottom: 11px; border-bottom: 1px solid var(--hair);
+}
+.bench-total { font-size: 13px; color: var(--ash); font-variant-numeric: tabular-nums }
+.bench-total b { font-size: 15px; color: var(--text) }
+.bench-total b.ok { color: var(--jade-txt) }
+.bench-total b.crit { color: var(--blood-txt) }
+.bench-flow, .bench-cost { font-size: 11px; color: var(--ash-2) }
+.bench-cost b { color: var(--ember-txt) }
+.bench-actions { margin-left: auto; display: flex; gap: 6px }
+
+.bench-ok {
+  font-size: 11px; color: var(--jade-txt); background: var(--jade-veil);
+  border-left: 3px solid var(--jade); padding: 6px 10px; margin-bottom: 11px;
+}
+
+.bench-cols { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)) }
+.bench-col { border: 1px solid var(--hair); background: var(--abyss-deep) }
+.bench-col.bc-cut { border-left: 3px solid var(--blood) }
+.bench-col.bc-add { border-left: 3px solid var(--jade) }
+.bench-col-h {
+  font-size: 9px; letter-spacing: .16em; text-transform: uppercase; font-weight: 700;
+  color: var(--ash-2); padding: 7px 10px; border-bottom: 1px solid var(--hair);
+}
+.bc-cut .bench-col-h b { color: var(--blood-txt) }
+.bc-add .bench-col-h b { color: var(--jade-txt) }
+.bench-empty { padding: 12px 10px; color: var(--ash-2); font-size: 11px }
+
+.bench-row {
+  display: flex; gap: 9px; align-items: center;
+  padding: 6px 10px; border-bottom: 1px solid var(--hair);
+}
+.bench-row:last-child { border-bottom: none }
+.bench-img { width: 32px; border-radius: 3px; flex: 0 0 auto }
+.bench-b { flex: 1; min-width: 0 }
+.bench-n { font-size: 12px; font-weight: 700; color: var(--text) }
+.bench-cost-sym { color: var(--ember-txt); font-size: 10px; margin-left: 7px }
+.bench-w { font-size: 10.5px; color: var(--ash); margin-top: 2px; line-height: 1.4 }
+.bench-p {
+  font-size: 11.5px; color: var(--jade-txt); font-variant-numeric: tabular-nums;
+  white-space: nowrap; flex: 0 0 auto;
+}
+.bench-x {
+  font: inherit; font-size: 15px; line-height: 1; cursor: pointer;
+  background: transparent; border: none; color: var(--ash-2); padding: 0 2px; flex: 0 0 auto;
+}
+.bench-x:hover { color: var(--blood-txt) }
+
+/* ---------- Directives ---------- */
+.dir-input {
+  width: 100%; font: inherit; font-size: 12px; line-height: 1.6;
+  background: var(--abyss-deep); color: var(--text);
+  border: 1px solid var(--hair-2); padding: 10px 12px; resize: vertical;
+}
+.dir-input:focus { outline: none; border-color: var(--blood) }
+.dir-input::placeholder { color: var(--ash-2); opacity: .65 }
+
+.dir-bar { display: flex; align-items: center; gap: 10px; margin-top: 9px; flex-wrap: wrap }
+.dir-chips { display: flex; gap: 5px; flex-wrap: wrap; margin-left: auto }
+.dir-chip {
+  font: inherit; font-size: 10px; cursor: pointer; padding: 3px 8px;
+  background: transparent; color: var(--ash-2);
+  border: 1px dashed var(--hair-2); transition: all .15s ease;
+}
+.dir-chip:hover { color: var(--ember-txt); border-color: var(--ember-edge); border-style: solid }
+
+.dir-report { margin-top: 12px; display: grid; gap: 4px }
+.dir-line {
+  font-size: 11.5px; color: var(--ash); line-height: 1.5;
+  background: var(--abyss-deep); border-left: 2px solid var(--ember);
+  padding: 5px 10px;
+}
+.dir-reject { font-size: 11px; margin-top: 3px }
+
+.dir-commit {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  margin-top: 11px; padding-top: 10px; border-top: 1px solid var(--hair);
+  font-size: 11.5px; color: var(--ash);
+}
+.dir-commit b { color: var(--text) }
+.dir-commit b.ok { color: var(--jade-txt) }
+.dir-commit b.crit { color: var(--blood-txt) }
+.dir-commit .btn { margin-left: auto }
+
+/* ---------- Pool ---------- */
+.pool-bar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap }
+.pool-input {
+  flex: 1; min-width: 240px; font: inherit; font-size: 12px;
+  background: var(--abyss-deep); color: var(--text);
+  border: 1px solid var(--hair-2); padding: 6px 10px;
+}
+.pool-price { width: 80px; font: inherit; font-size: 12px;
+  background: var(--abyss-deep); color: var(--text);
+  border: 1px solid var(--hair-2); padding: 6px 10px; }
+.pool-input:focus, .pool-price:focus { outline: none; border-color: var(--blood) }
+.pool-check {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 10px; letter-spacing: .08em; color: var(--ash-2); cursor: pointer;
+}
+.pool-check input { accent-color: var(--blood-hi); width: 13px; height: 13px; cursor: pointer }
+
+.pool-presets { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 9px }
+
+.pool-meta {
+  margin-top: 11px; font-size: 10.5px; color: var(--ash-2); letter-spacing: .04em;
+}
+.pool-meta b { color: var(--ember-txt) }
+.pool-meta code {
+  font: inherit; color: var(--purple-txt); background: var(--abyss-deep);
+  border: 1px solid var(--hair); padding: 1px 5px; word-break: break-all;
+}
+
+.pool-grid {
+  margin-top: 11px; display: grid; gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+  max-height: 560px; overflow-y: auto; padding-right: 6px;
+}
+.pool-card { background: var(--abyss-deep); border: 1px solid var(--hair); padding: 6px }
+.pool-card img { width: 100%; border-radius: 5px; display: block }
+.pool-foot { display: flex; align-items: center; gap: 6px; margin-top: 6px }
+.pool-p {
+  font-size: 11.5px; color: var(--jade-txt); font-variant-numeric: tabular-nums; flex: 1;
+}
+.pool-add {
+  font: inherit; font-size: 14px; line-height: 1; font-weight: 700; cursor: pointer;
+  background: var(--blood); color: #fff; border: none; padding: 2px 9px;
+}
+.pool-add:hover { background: var(--blood-hi) }
+
+/* ---------- Recommandations ---------- */
+.advice-act {
+  margin-left: auto; font: inherit; font-size: 10px; font-weight: 700; letter-spacing: .1em;
+  cursor: pointer; background: transparent; color: var(--ember-txt);
+  border: 1px solid var(--ember-edge); padding: 2px 9px;
+}
+.advice-act:hover { background: var(--ember-veil) }
+.advice-cards { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 7px }
+.advice-card {
+  font-size: 10px; color: var(--ash); background: var(--abyss-deep);
+  border: 1px solid var(--hair); padding: 1px 7px;
+}
+.advice-more { font-size: 10px; color: var(--ash-2); padding: 1px 4px }
+
+.pool-check.off { opacity: .4; cursor: not-allowed }
+.pool-check.off input { cursor: not-allowed }
