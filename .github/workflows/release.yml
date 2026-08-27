@@ -1,0 +1,90 @@
+# ============================================================
+#  Publication automatique
+#
+#  A chaque poussee sur `main` touchant au code : le numero de
+#  version passe au correctif suivant, un tag est pose, les deux
+#  installeurs sont produits et la version est publiee.
+#
+#  L'operateur pousse. Le reste suit.
+# ============================================================
+name: Publication
+
+on:
+  push:
+    branches: [main]
+    # Une correction de documentation ne merite pas une version.
+    # Retirer ces lignes pour publier a chaque poussee, quelle qu'elle soit.
+    paths-ignore:
+      - '**.md'
+      - '.github/**'
+      - '.gitignore'
+
+permissions:
+  contents: write
+
+jobs:
+  # --- 1 · Incremente et pose le tag -------------------------
+  version:
+    # Le job pousse un commit ; sans ce garde-fou il se redeclencherait
+    # lui-meme, indefiniment.
+    if: ${{ !contains(github.event.head_commit.message, '[skip ci]') }}
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.bump.outputs.tag }}
+      version: ${{ steps.bump.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - id: bump
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          VERSION=$(npm version patch --no-git-tag-version | tr -d 'v')
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
+
+          git add package.json package-lock.json
+          git commit -m "Version $VERSION [skip ci]"
+          git tag "v$VERSION"
+          git push origin main --follow-tags
+
+  # --- 2 · Compile et publie, une plateforme par machine -----
+  build:
+    needs: version
+    strategy:
+      # Un echec sur une plateforme ne doit pas priver l'autre de sa
+      # publication : la release restera incomplete, pas absente.
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-14
+            target: --mac
+          - os: windows-latest
+            target: --win
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.version.outputs.tag }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Compile et publie
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npm run build
+          npx electron-builder ${{ matrix.target }} --publish always
