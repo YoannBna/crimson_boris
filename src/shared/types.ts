@@ -149,8 +149,12 @@ export interface BorisAPI {
   config: import('./config').ConfigAPI
   getVersion(): Promise<import('./version').VersionInfo>
   checkVersion(): Promise<import('./version').VersionInfo>
+  /** Lance le telechargement de la mise a jour — Windows uniquement */
+  downloadUpdate(): Promise<void>
   /** Redemarre et applique la mise a jour deja telechargee */
   installUpdate(): Promise<void>
+  /** Ouvre la page des versions dans le navigateur — voie macOS */
+  openReleases(): Promise<void>
   onVersion(cb: (v: import('./version').VersionInfo) => void): () => void
   mtg: MtgAPI
   forge: import('./forge').ForgeAPI

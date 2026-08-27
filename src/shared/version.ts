@@ -20,6 +20,18 @@ export type SyncState =
   | 'telechargement'/* mise a jour en cours de recuperation    */
   | 'prete'        /* telechargee, en attente de redemarrage   */
 
+/**
+ * Ce que le bouton de mise a jour declenche, selon la plateforme.
+ *
+ * `install` : telechargement puis redemarrage, pris en charge par
+ *             electron-updater. Windows uniquement.
+ * `open`    : ouverture de la page des versions dans le navigateur.
+ *             Seule voie sur macOS non signe, ou Squirrel refuse
+ *             d'appliquer un paquet dont il ne peut verifier la signature.
+ * `none`    : aucune action possible — developpement, ou depot absent.
+ */
+export type UpdateAction = 'install' | 'open' | 'none'
+
 export interface VersionInfo {
   /** Version de l'application, issue de package.json */
   local: string
@@ -40,6 +52,16 @@ export interface VersionInfo {
   autoUpdate: boolean
   /** Motif d'indisponibilite de la mise a jour automatique */
   autoUpdateBlocker: string | null
+  /**
+   * Notes de version publiees, converties en TEXTE BRUT par le process
+   * principal. Jamais du HTML : ce contenu vient d'un depot distant et
+   * n'a rien a faire dans le DOM sous forme de balises.
+   */
+  releaseNotes: string | null
+  /** Ce que fera le bouton d'action sur cette plateforme */
+  action: UpdateAction
+  /** Page des versions, construite localement — jamais fournie par le distant */
+  releasesUrl: string | null
 }
 
 /** Compare deux versions semantiques. > 0 si `a` est plus recente. */

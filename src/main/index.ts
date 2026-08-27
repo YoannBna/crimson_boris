@@ -554,9 +554,22 @@ function registerIpc(): void {
     const { checkVersion } = await import('./version')
     return checkVersion()
   })
+  /*
+   * Trois actions distinctes, aucune ne recevant de parametre du
+   * renderer : l'interface declenche, elle ne dicte pas. Aucune URL ni
+   * aucun chemin ne traverse le pont.
+   */
+  ipcMain.handle('version:download', async () => {
+    const { downloadUpdate } = await import('./updater')
+    await downloadUpdate()
+  })
   ipcMain.handle('version:install', async () => {
     const { installNow } = await import('./updater')
     await installNow()
+  })
+  ipcMain.handle('version:open-releases', async () => {
+    const { openReleases } = await import('./updater')
+    await openReleases()
   })
 }
 
@@ -572,24 +585,34 @@ function registerIpc(): void {
  */
 async function setupUpdates(): Promise<void> {
   const v = await import('./version')
-  const { startUpdater, autoUpdateBlocker } = await import('./updater')
+  const { startUpdater, autoUpdateBlocker, updateAction, releasesUrl } = await import('./updater')
 
   v.onVersionChange((next) => broadcast('version:changed', next))
 
   const blocker = autoUpdateBlocker()
-  v.patchVersion({ autoUpdate: blocker === null, autoUpdateBlocker: blocker })
+  v.patchVersion({
+    autoUpdate: blocker === null,
+    autoUpdateBlocker: blocker,
+    action: updateAction(),
+    releasesUrl: releasesUrl()
+  })
 
   // La surveillance par manifeste fonctionne partout, signature ou non.
   void v.checkVersion()
 
   await startUpdater({
     onChecking: () => v.patchVersion({ state: 'verification' }),
-    onAvailable: (version) =>
+
+    // Detectee, PAS telechargee : l'etat s'arrete la jusqu'a decision.
+    onAvailable: (version, notes) =>
       v.patchVersion({
         remote: version,
-        state: 'telechargement',
-        detail: `Version ${version} en cours de recuperation.`
+        state: 'disponible',
+        releaseNotes: notes,
+        progress: null,
+        detail: `Version ${version} publiee.`
       }),
+
     onNone: () => v.patchVersion({ state: 'a-jour', detail: null, progress: null }),
     onProgress: (progress) => v.patchVersion({ state: 'telechargement', progress }),
     onReady: (version) =>

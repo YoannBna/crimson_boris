@@ -479,3 +479,107 @@ footer {
   padding: 18px 26px 22px; border-top: 1px solid var(--hair);
 }
 .set-legal { flex: 1; min-width: 240px; font-size: 10.5px; color: var(--ash-2); line-height: 1.6 }
+
+/* ============================================================
+   PANNEAU DE MISE A JOUR
+   ============================================================ */
+.upd-veil {
+  position: fixed; inset: 0; z-index: 70;
+  background: rgba(6, 4, 4, .84); backdrop-filter: blur(3px);
+  display: flex; align-items: center; justify-content: center; padding: 40px 20px;
+}
+.upd-sheet {
+  width: 100%; max-width: 560px;
+  background: linear-gradient(180deg, var(--panel), var(--abyss));
+  border: 1px solid var(--ember-edge);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, .82);
+  display: flex; flex-direction: column; max-height: 80vh;
+}
+
+.upd-head {
+  display: flex; align-items: flex-start; gap: 16px;
+  padding: 20px 24px 16px; position: relative;
+  background: linear-gradient(180deg, var(--ember-veil), transparent);
+  border-bottom: 1px solid var(--hair);
+}
+.upd-head::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px;
+  background: linear-gradient(90deg, var(--blood), var(--ember-hi), var(--blood));
+}
+.upd-head h2 { font-size: 13px; letter-spacing: .26em; font-weight: 700; color: var(--text) }
+.upd-jump {
+  display: block; margin-top: 6px; font-size: 12px; color: var(--ash);
+  font-variant-numeric: tabular-nums;
+}
+.upd-jump b { color: var(--ash-2); font-weight: 700 }
+.upd-arrow { color: var(--ember-txt); padding: 0 3px }
+.upd-jump b.upd-new { color: var(--ember-txt) }
+
+.upd-body { padding: 18px 24px; overflow-y: auto }
+.upd-label {
+  font-size: 9px; letter-spacing: .18em; text-transform: uppercase;
+  font-weight: 700; color: var(--ember-txt); margin-bottom: 8px;
+}
+.upd-notes {
+  font: inherit; font-size: 11.5px; line-height: 1.6; color: var(--ash);
+  white-space: pre-wrap; word-break: break-word;
+  background: var(--abyss-deep); border: 1px solid var(--hair);
+  border-left: 3px solid var(--ember); padding: 11px 13px;
+  max-height: 240px; overflow-y: auto;
+}
+.upd-empty { font-size: 11.5px; color: var(--ash-2); font-style: italic }
+
+/* --- Progression --- */
+.upd-dl { margin-top: 16px }
+.upd-dl-h {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--ash-2);
+}
+.upd-dl-h b { font-size: 13px; color: var(--ember-txt); font-variant-numeric: tabular-nums }
+.upd-bar {
+  height: 5px; margin-top: 6px; background: var(--abyss-deep);
+  border: 1px solid var(--hair); overflow: hidden;
+}
+.upd-bar span {
+  display: block; height: 100%;
+  background: linear-gradient(90deg, var(--ember), var(--ember-hi));
+  box-shadow: 0 0 10px rgba(255, 122, 47, .8);
+  transition: width .3s ease;
+}
+.upd-dl-f {
+  margin-top: 5px; font-size: 10.5px; color: var(--ash-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.upd-note-mac {
+  margin-top: 16px; padding: 10px 13px; font-size: 11px; line-height: 1.6;
+  color: var(--ash); background: var(--blood-veil);
+  border: 1px solid var(--blood-edge); border-left: 3px solid var(--blood);
+}
+.upd-note-mac b { color: var(--ember-txt) }
+
+.upd-foot {
+  display: flex; align-items: center; gap: 10px; justify-content: flex-end;
+  padding: 16px 24px 20px; border-top: 1px solid var(--hair);
+}
+.upd-go {
+  background: linear-gradient(180deg, var(--ember), #C2410C);
+  border: 1px solid var(--ember-hi); color: #fff;
+  padding: 8px 18px; letter-spacing: .14em;
+  box-shadow: 0 4px 16px rgba(232, 89, 12, .32);
+}
+.upd-go:hover { background: linear-gradient(180deg, var(--ember-hi), var(--ember)) }
+.upd-go:disabled { opacity: .55; cursor: default; box-shadow: none }
+.upd-go.upd-ready {
+  background: linear-gradient(180deg, var(--jade-hi), var(--jade));
+  border-color: var(--jade-hi); box-shadow: 0 4px 16px rgba(53, 199, 123, .32);
+}
+
+/* --- L'indicateur devient cliquable pour agir --- */
+.sy-new .sync-pill, .sy-dl .sync-pill, .sy-ready .sync-pill {
+  border-color: var(--ember-edge);
+}
+.sy-new .sync-pill:hover, .sy-dl .sync-pill:hover {
+  border-color: var(--ember-hi);
+  box-shadow: 0 6px 18px rgba(0,0,0,.55), 0 0 14px rgba(255,122,47,.3);
+}

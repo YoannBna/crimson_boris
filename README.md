@@ -66,27 +66,48 @@ Boris surveille sa propre version et se met a jour **au lancement**, jamais
 pendant qu'il tourne : remplacer son binaire en cours d'execution est le
 meilleur moyen de le corrompre.
 
-### Mise a jour automatique
+### Mise a jour — manuelle et interactive
 
-`electron-updater` interroge **GitHub Releases** au demarrage, telecharge en
-tache de fond, puis propose de redemarrer. Boris ne redemarre jamais seul :
-couper une session de travail sans prevenir serait pire que rester une version
-en retard.
+Boris **verifie** au demarrage mais ne telecharge rien de lui-meme :
+`autoDownload` est desactive. Cent trente megaoctets tires sur la connexion de
+quelqu'un sans son accord, ce n'est pas une decision qui revient a une
+application.
 
-Renseigner `publish.owner` dans `electron-builder.yml`, puis :
+Le numero de version, en bas a droite, dit l'etat d'un coup d'oeil :
+
+| Couleur | Etat |
+|---|---|
+| **vert** | derniere version |
+| **braise** | une version plus recente existe |
+| gris | verification, depot injoignable, ou aucun depot declare |
+
+Un clic sur l'indicateur braise ouvre un panneau qui affiche les **notes de
+version** publiees, puis propose d'agir. Les notes arrivent en texte brut :
+GitHub renvoie du HTML, converti dans le process principal et rendu dans un
+`<pre>`. Du contenu distant n'est jamais interprete comme du balisage.
+
+**Windows** — le bouton telecharge (`downloadUpdate()`), affiche une barre de
+progression braise, puis redemarre et installe (`quitAndInstall()`).
+
+**macOS** — Squirrel verifie la signature du paquet avant de l'appliquer. Sans
+certificat Apple Developer ID, `quitAndInstall()` echoue **apres** avoir
+telecharge : l'operateur attend, puis rien. Le bouton ouvre donc la page des
+versions dans le navigateur, pour recuperer le `.dmg` a la main. Le panneau
+l'explique au lieu de le subir.
+
+L'adresse de cette page est **construite a la compilation** depuis
+`electron-builder.yml`, jamais reprise d'une reponse du serveur :
+`shell.openExternal` ouvre ce qu'on lui donne, et une URL venue du reseau y
+serait une porte d'entree.
+
+Les cinq canaux IPC de mise a jour n'acceptent **aucun parametre** du renderer :
+l'interface declenche, elle ne dicte pas.
+
+Pour publier une version :
 
 ```
 npm run release      # compile, empaquette macOS + Windows, publie la release
 ```
-
-> **Limite sur macOS.** Squirrel.Mac verifie la signature du paquet avant de
-> l'appliquer. Sans certificat Apple Developer ID (99 $/an), la mise a jour se
-> telecharge puis **echoue a l'installation**. Ce n'est pas un defaut de
-> configuration, c'est une exigence du systeme. Le canal automatique est donc
-> desactive sur macOS non signe — l'indicateur l'affiche explicitement — et le
-> script de lancement prend le relais. Sur **Windows**, l'installeur NSIS
-> s'applique sans signature, avec un avertissement SmartScreen au premier
-> lancement.
 
 ### Scripts de demarrage
 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { SyncState, VersionInfo } from '@shared/version'
 import { hasBridge } from '@/lib/useBoris'
+import { UpdateModal } from './UpdateModal'
 
 /*
  * Indicateur de synchronisation.
@@ -37,6 +38,21 @@ const TONE: Record<SyncState, string> = {
 export function SyncBadge() {
   const [info, setInfo] = useState<VersionInfo | null>(null)
   const [open, setOpen] = useState(false)
+  const [modal, setModal] = useState(false)
+  const [busy, setBusy] = useState(false)
+
+  const act = async (fn: () => Promise<void>): Promise<void> => {
+    setBusy(true)
+    try {
+      await fn()
+    } catch (err) {
+      setInfo((i) =>
+        i ? { ...i, detail: err instanceof Error ? err.message : String(err) } : i
+      )
+    } finally {
+      setBusy(false)
+    }
+  }
 
   useEffect(() => {
     if (!hasBridge) return
@@ -48,6 +64,11 @@ export function SyncBadge() {
   }, [])
 
   if (!info) return null
+
+  /* Une version en retard appelle une decision : le clic ouvre le
+   * panneau de mise a jour. Sinon, il deroule le detail technique. */
+  const pending =
+    info.state === 'disponible' || info.state === 'telechargement' || info.state === 'prete'
 
   const stamp =
     info.builtAt === 'dev'
@@ -63,7 +84,7 @@ export function SyncBadge() {
     <div className={`sync ${TONE[info.state]}${open ? ' open' : ''}`}>
       <button
         className="sync-pill"
-        onClick={() => setOpen((v) => !v)}
+        onClick={() => (pending ? setModal(true) : setOpen((v) => !v))}
         title={`Boris ${info.local} — ${LABEL[info.state]}`}
       >
         <span className="sync-dot" />
@@ -126,22 +147,31 @@ export function SyncBadge() {
             <div className="sync-detail sync-blocked">{info.autoUpdateBlocker}</div>
           )}
 
-          {info.state === 'prete' ? (
-            <button
-              className="sync-install"
-              onClick={() => void window.boris.installUpdate()}
-            >
-              Redemarrer et appliquer
+          {pending ? (
+            <button className="sync-install" onClick={() => setModal(true)}>
+              Voir la mise a jour
             </button>
           ) : (
             <button
               className="sync-check"
               onClick={() => void window.boris.checkVersion().then(setInfo)}
+              disabled={busy}
             >
               Verifier maintenant
             </button>
           )}
         </div>
+      )}
+
+      {modal && (
+        <UpdateModal
+          info={info}
+          busy={busy}
+          onDownload={() => void act(() => window.boris.downloadUpdate())}
+          onInstall={() => void act(() => window.boris.installUpdate())}
+          onOpenReleases={() => void act(() => window.boris.openReleases())}
+          onClose={() => setModal(false)}
+        />
       )}
     </div>
   )

@@ -47,7 +47,10 @@ let info: VersionInfo = {
   source: null,
   progress: null,
   autoUpdate: false,
-  autoUpdateBlocker: null
+  autoUpdateBlocker: null,
+  releaseNotes: null,
+  action: 'none',
+  releasesUrl: null
 }
 
 /** Applique une modification partielle et diffuse le nouvel etat. */
@@ -114,14 +117,19 @@ export async function checkVersion(): Promise<VersionInfo> {
     const behind = compareVersions(remote, info.local) > 0
     const state: SyncState = behind ? 'disponible' : 'a-jour'
 
+    // Les deux chemins de detection — manifeste et electron-updater —
+    // doivent renseigner les memes champs, sinon le panneau se retrouve
+    // sans notes selon la voie empruntee.
+    const { plainNotes } = await import('./updater')
+    const notes = behind ? plainNotes(raw.body ?? raw.notes ?? '') : null
+
     info = {
       ...info,
       remote,
       state,
+      releaseNotes: notes,
       checkedAt: new Date().toISOString(),
-      detail: behind
-        ? `Version ${remote} publiee. Elle sera appliquee au prochain lancement par le script de demarrage.`
-        : null,
+      detail: behind ? `Version ${remote} publiee.` : null,
       source: url
     }
   } catch (err) {
