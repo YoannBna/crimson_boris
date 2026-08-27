@@ -309,6 +309,15 @@ async function captureForReview(outFile: string): Promise<void> {
     await new Promise((r) => setTimeout(r, 600))
   }
 
+  // Permet de piloter un element precis — un panneau modal ne suit pas
+  // le defilement du document.
+  const js = process.env['BORIS_SHOT_JS']
+  if (js) {
+    const out = await w.webContents.executeJavaScript(js)
+    console.log('js :', JSON.stringify(out))
+    await new Promise((r) => setTimeout(r, 700))
+  }
+
   const extra = Number(process.env['BORIS_SHOT_SCROLL'] ?? 0)
   if (extra) {
     await w.webContents.executeJavaScript(`window.scrollBy(0, ${extra})`)

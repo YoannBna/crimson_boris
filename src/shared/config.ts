@@ -16,6 +16,12 @@ export interface OperatorProfile {
   tickers: string[]
   /** Flux RSS surveilles par le module de veille */
   feeds: string[]
+  /**
+   * Deck Archidekt suivi : URL complete ou identifiant numerique.
+   * Reglage non secret — c'est une adresse publique, elle n'a rien a
+   * faire dans le coffre chiffre.
+   */
+  archidektDeck: string
 }
 
 export interface ConnectorStatus {
@@ -74,6 +80,7 @@ export const CONNECTOR_FIELDS: Record<
 export const DEFAULT_PROFILE: OperatorProfile = {
   displayName: '',
   timeZone: 'Europe/Paris',
+  archidektDeck: '',
   tickers: ['^FCHI', '^GSPC', '^IXIC', 'BZ=F', 'GC=F', 'EURUSD=X', 'BTC-USD'],
   feeds: []
 }

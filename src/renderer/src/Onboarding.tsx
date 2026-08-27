@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { AppConfig, ConnectorId } from '@shared/config'
-import { CONNECTOR_FIELDS } from '@shared/config'
+import { ConnectorFields } from './components/ConnectorFields'
 
 /*
  * Panneau d'accueil.
@@ -57,9 +57,6 @@ export function Onboarding({
   error: string | null
 }) {
   const [name, setName] = useState(config.profile.displayName)
-  const [values, setValues] = useState<Record<string, string>>({})
-
-  const set = (k: string, v: string): void => setValues((s) => ({ ...s, [k]: v }))
 
   return (
     <div className="onb">
@@ -112,34 +109,20 @@ export function Onboarding({
               </div>
               <p className="onb-role">{c.role}</p>
 
+              <ConnectorFields
+                id={c.id}
+                status={status}
+                onSecret={onSecret}
+                busy={busy}
+                editable={false}
+              />
+
               {state !== 'configure' && (
-                <>
-                  {CONNECTOR_FIELDS[c.id].map((f) => (
-                    <label className="onb-field" key={f.key}>
-                      <span>
-                        {f.label}
-                        {f.optional && <i> — facultatif</i>}
-                      </span>
-                      <input
-                        type={/password|token/i.test(f.key) ? 'password' : 'text'}
-                        className="onb-input"
-                        placeholder={f.hint}
-                        autoComplete="off"
-                        value={values[f.key] ?? ''}
-                        onChange={(e) => set(f.key, e.target.value)}
-                        onBlur={() => {
-                          const v = values[f.key]
-                          if (v && v.trim() !== '') onSecret(c.id, f.key, v)
-                        }}
-                      />
-                    </label>
-                  ))}
-                  <div className="onb-actions">
-                    <button className="btn ghost" onClick={() => onSkip(c.id)} disabled={busy}>
-                      Passer pour l’instant
-                    </button>
-                  </div>
-                </>
+                <div className="onb-actions">
+                  <button className="btn ghost" onClick={() => onSkip(c.id)} disabled={busy}>
+                    Passer pour l’instant
+                  </button>
+                </div>
               )}
 
               <p className="onb-note">{c.note}</p>
@@ -151,8 +134,8 @@ export function Onboarding({
 
         <footer className="onb-foot">
           <p className="onb-legal">
-            Aucune donnee ne quitte ce poste. Tu peux tout effacer a tout moment depuis la barre
-            de menus — profil, identifiants, historique — sans rien demander a personne.
+            Aucune donnee ne quitte ce poste. Rien n’est definitif : tout se modifie ensuite
+            depuis <b>Profil &amp; parametres</b>, accessible en permanence depuis le bandeau.
           </p>
           <button className="btn onb-go" onClick={onComplete} disabled={busy}>
             {busy ? 'Enregistrement…' : 'Ouvrir le terminal'}

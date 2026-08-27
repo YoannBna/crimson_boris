@@ -382,3 +382,100 @@ footer {
 }
 .onb-legal { flex: 1; min-width: 260px; font-size: 11px; color: var(--ash-2); line-height: 1.6 }
 .onb-go { font-size: 11px; padding: 9px 22px; letter-spacing: .16em }
+
+/* ============================================================
+   BOUTON DE PROFIL — bandeau
+   ============================================================ */
+.hdr-btn { margin-left: auto; display: flex; gap: 8px; align-items: center }
+
+.sigil-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: linear-gradient(180deg, var(--blood), #8B1520);
+  border: 1px solid var(--blood-hi); position: relative;
+  padding: 5px 13px; letter-spacing: .14em;
+  box-shadow: 0 0 0 1px rgba(0,0,0,.4), 0 4px 14px rgba(200,30,45,.28);
+}
+.sigil-btn:hover {
+  background: linear-gradient(180deg, var(--blood-hi), var(--blood));
+  box-shadow: 0 0 0 1px rgba(0,0,0,.4), 0 5px 20px rgba(230,57,70,.45);
+}
+.sigil-mark { font-size: 12px; line-height: 1; color: #FFD9B0 }
+.sigil-badge {
+  min-width: 15px; height: 15px; padding: 0 4px; border-radius: 8px;
+  background: var(--ember-hi); color: var(--abyss-deep);
+  font-size: 9px; font-weight: 700; line-height: 15px; text-align: center;
+  box-shadow: 0 0 8px rgba(255,122,47,.7);
+}
+
+/* ============================================================
+   PANNEAU PROFIL & PARAMETRES
+   ============================================================ */
+.set-veil {
+  position: fixed; inset: 0; z-index: 60;
+  background: rgba(6, 4, 4, .82);
+  backdrop-filter: blur(3px);
+  display: flex; align-items: flex-start; justify-content: center;
+  padding: 40px 20px; overflow-y: auto;
+}
+.set-sheet {
+  width: 100%; max-width: 720px;
+  background: linear-gradient(180deg, var(--panel), var(--abyss));
+  border: 1px solid var(--blood-edge);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, .8);
+  display: flex; flex-direction: column;
+}
+
+.set-head {
+  display: flex; align-items: flex-start; gap: 16px;
+  padding: 20px 26px 16px; position: relative;
+  background: linear-gradient(180deg, var(--blood-veil), transparent);
+  border-bottom: 1px solid var(--hair);
+}
+.set-head::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: -1px;
+  height: 2px; background: var(--sigil);
+}
+.set-head h2 {
+  font-size: 14px; letter-spacing: .28em; font-weight: 700; color: var(--text);
+}
+.set-sub {
+  display: block; margin-top: 5px;
+  font-size: 10px; letter-spacing: .12em; color: var(--ember-txt);
+}
+.set-close {
+  margin-left: auto; font: inherit; font-size: 22px; line-height: 1;
+  cursor: pointer; background: transparent; border: none;
+  color: var(--ash-2); padding: 0 4px;
+}
+.set-close:hover { color: var(--blood-txt) }
+
+.set-body { padding: 0 0 4px }
+.set-body .onb-block { padding: 18px 26px }
+.set-body .onb-warn { margin: 16px 26px 0 }
+
+/* --- Champ deck Archidekt --- */
+.set-deck { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--hair-2) }
+.set-hint {
+  display: block; margin-top: 5px; font-size: 10.5px; line-height: 1.5;
+  color: var(--ash-2); font-style: normal;
+}
+
+/* --- Connecteur deja relie --- */
+.cf-linked { display: flex; align-items: center; gap: 9px; flex-wrap: wrap }
+.cf-account {
+  font-size: 11.5px; color: var(--jade-txt); letter-spacing: .04em;
+  background: var(--jade-veil); border: 1px solid var(--jade-edge); padding: 3px 10px;
+}
+.cf-cut:hover { color: var(--blood-txt); border-color: var(--blood-edge) }
+
+/* --- Effacement --- */
+.set-danger { border-top: 1px solid var(--blood-edge); background: var(--blood-veil) }
+.set-danger .onb-label { color: var(--blood-txt) }
+.set-purge { background: transparent; color: var(--blood-txt); border: 1px solid var(--blood) }
+.set-purge:hover { background: var(--blood); color: #fff }
+
+.set-foot {
+  display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+  padding: 18px 26px 22px; border-top: 1px solid var(--hair);
+}
+.set-legal { flex: 1; min-width: 240px; font-size: 10.5px; color: var(--ash-2); line-height: 1.6 }

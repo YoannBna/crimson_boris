@@ -5,6 +5,7 @@ import { DEFAULT_PROFILE } from '@shared/config'
 import { hasBridge, useCoreStatus } from './lib/useBoris'
 import { SyncBadge } from './components/SyncBadge'
 import { Onboarding } from './Onboarding'
+import { Settings } from './Settings'
 import { M01Actualites } from './modules/M01Actualites'
 import { M02Radar } from './modules/M02Radar'
 import { M03Courrier } from './modules/M03Courrier'
@@ -97,6 +98,7 @@ export default function App() {
   const status = useCoreStatus()
   const active = status?.active ?? true
   const { config, busy, error, run } = useConfig()
+  const [settingsOpen, setSettingsOpen] = useState(false)
 
   // Tant que la configuration n'est pas lue, on n'affiche rien : mieux
   // vaut un instant vide qu'un tableau de bord qui clignote avant de
@@ -123,6 +125,7 @@ export default function App() {
 
   const profile = config?.profile ?? DEFAULT_PROFILE
   const mailConnector = config?.connectors.find((c) => c.id === 'mail')
+  const pendingConnectors = config?.connectors.filter((c) => c.state === 'absent').length ?? 0
 
   const today = new Date().toLocaleDateString('fr-FR', {
     day: '2-digit',
@@ -137,13 +140,24 @@ export default function App() {
           <h1>CRIMSON BORIS</h1>
           <span className="sub">// Noyau Analytique &amp; Executif — v2.0</span>
           {hasBridge && (
-            <button
-              className="btn ghost hdr-btn"
-              disabled={!active || status?.running}
-              onClick={() => void window.boris.refreshNow()}
-            >
-              {status?.running ? 'Cycle en cours…' : 'Rafraichir'}
-            </button>
+            <div className="hdr-btn">
+              <button
+                className="btn ghost"
+                disabled={!active || status?.running}
+                onClick={() => void window.boris.refreshNow()}
+              >
+                {status?.running ? 'Cycle en cours…' : 'Rafraichir'}
+              </button>
+              <button
+                className="btn sigil-btn"
+                onClick={() => setSettingsOpen(true)}
+                title="Profil & parametres"
+              >
+                <span className="sigil-mark">◈</span>
+                {profile.displayName !== '' ? profile.displayName : 'Profil'}
+                {pendingConnectors > 0 && <span className="sigil-badge">{pendingConnectors}</span>}
+              </button>
+            </div>
           )}
         </div>
         <div className="hdr-meta">
@@ -183,6 +197,29 @@ export default function App() {
           </span>
         </div>
       </header>
+
+      {settingsOpen && config && (
+        <Settings
+          config={config}
+          busy={busy}
+          error={error}
+          onSecret={(c, key, value) =>
+            void run(() => window.boris.config.setSecret(c, key, value))
+          }
+          onClear={(c) => void run(() => window.boris.config.clearConnector(c))}
+          onProfile={(patch) => void run(() => window.boris.config.saveProfile(patch))}
+          onPurge={() =>
+            void run(async () => {
+              await window.boris.config.purge()
+              // Le profil disparait : on relit l'etat plutot que d'afficher
+              // un panneau decrivant des donnees qui n'existent plus.
+              setSettingsOpen(false)
+              return window.boris.config.get()
+            })
+          }
+          onClose={() => setSettingsOpen(false)}
+        />
+      )}
 
       {status && <SignalBar status={status} />}
 
