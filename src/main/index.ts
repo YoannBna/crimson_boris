@@ -551,8 +551,17 @@ function registerIpc(): void {
     return currentVersion()
   })
   ipcMain.handle('version:check', async () => {
-    const { checkVersion } = await import('./version')
-    return checkVersion()
+    const v = await import('./version')
+    const { recheck } = await import('./updater')
+
+    // Sur une application empaquetee, la verification passe par le meme
+    // canal que la detection initiale : interroger deux sources donnerait
+    // deux verdicts.
+    if (app.isPackaged && (await import('./updater')).releasesUrl() !== null) {
+      await recheck()
+      return v.currentVersion()
+    }
+    return v.checkVersion()
   })
   /*
    * Trois actions distinctes, aucune ne recevant de parametre du
@@ -597,8 +606,20 @@ async function setupUpdates(): Promise<void> {
     releasesUrl: releasesUrl()
   })
 
-  // La surveillance par manifeste fonctionne partout, signature ou non.
-  void v.checkVersion()
+  /*
+   * Deux canaux de detection coexistent, et l'un doit ceder :
+   *   - electron-updater interroge GitHub Releases ; il fait autorite
+   *     des que l'application est empaquetee et le depot renseigne ;
+   *   - le manifeste (BORIS_UPDATE_URL) sert de repli, notamment en
+   *     developpement ou electron-updater ne fonctionne pas.
+   *
+   * Les lancer tous les deux faisait ecraser le resultat du premier par
+   * le second : l'indicateur annoncait « aucun depot declare » alors
+   * qu'une version etait publiee.
+   */
+  const { manifestUrl } = v
+  const updaterAuthoritative = app.isPackaged && releasesUrl() !== null
+  if (!updaterAuthoritative || manifestUrl() !== null) void v.checkVersion()
 
   await startUpdater({
     onChecking: () => v.patchVersion({ state: 'verification' }),

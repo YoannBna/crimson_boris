@@ -99,6 +99,26 @@ export function plainNotes(notes: unknown): string | null {
   return text === '' ? null : text.slice(0, 4000)
 }
 
+/*
+ * Acces a `autoUpdater`.
+ *
+ * electron-updater est un module CommonJS. Dans le bundle du process
+ * principal, `await import()` le fait remonter tantot a plat, tantot
+ * sous `.default` selon l'interop appliquee. Le deballer directement
+ * donnait `undefined` une fois l'application empaquetee — et tout le
+ * canal de mise a jour restait inerte, sans la moindre erreur visible
+ * au lancement.
+ */
+async function updater(): Promise<import('electron-updater').AppUpdater> {
+  const mod = (await import('electron-updater')) as unknown as {
+    autoUpdater?: import('electron-updater').AppUpdater
+    default?: { autoUpdater?: import('electron-updater').AppUpdater }
+  }
+  const u = mod.autoUpdater ?? mod.default?.autoUpdater
+  if (!u) throw new Error("electron-updater : 'autoUpdater' introuvable dans le module.")
+  return u
+}
+
 export interface UpdaterEvents {
   onChecking: () => void
   onAvailable: (version: string, notes: string | null) => void
@@ -119,7 +139,7 @@ export async function startUpdater(events: UpdaterEvents): Promise<void> {
     return
   }
 
-  const { autoUpdater } = await import('electron-updater')
+  const autoUpdater = await updater()
 
   // Le coeur du mode manuel : on regarde, on ne prend rien.
   autoUpdater.autoDownload = false
@@ -151,12 +171,19 @@ export async function startUpdater(events: UpdaterEvents): Promise<void> {
   }
 }
 
+/** Relance une verification aupres du depot. */
+export async function recheck(): Promise<void> {
+  if (!app.isPackaged) return
+  const autoUpdater = await updater()
+  await autoUpdater.checkForUpdates()
+}
+
 /** Lance le telechargement. Windows uniquement — sur macOS il serait perdu. */
 export async function downloadUpdate(): Promise<void> {
   if (updateAction() !== 'install') {
     throw new Error("Le telechargement en place n'est pas disponible sur cette plateforme.")
   }
-  const { autoUpdater } = await import('electron-updater')
+  const autoUpdater = await updater()
   await autoUpdater.downloadUpdate()
 }
 
@@ -165,7 +192,7 @@ export async function installNow(): Promise<void> {
   if (updateAction() !== 'install') {
     throw new Error("L'installation en place n'est pas disponible sur cette plateforme.")
   }
-  const { autoUpdater } = await import('electron-updater')
+  const autoUpdater = await updater()
   autoUpdater.quitAndInstall(false, true)
 }
 
