@@ -103,7 +103,28 @@ serait une porte d'entree.
 Les cinq canaux IPC de mise a jour n'acceptent **aucun parametre** du renderer :
 l'interface declenche, elle ne dicte pas.
 
-Pour publier une version :
+### Publication automatique
+
+Une poussee sur `main` touchant au code suffit : le workflow
+`.github/workflows/release.yml` incremente le numero de correctif, pose le tag,
+compile sur un runner macOS et un runner Windows, et publie la version avec ses
+deux installeurs.
+
+```
+poussee sur main
+   └─ job « version »  : npm version patch, commit « [skip ci] », tag, push
+   └─ job « build »    : macos-14 + windows-latest, electron-builder --publish
+```
+
+Le commit de version porte `[skip ci]` : sans ce marqueur, il se redeclencherait
+lui-meme indefiniment. Les poussees ne touchant que la documentation, le
+`.gitignore` ou le workflow ne publient rien — retirer le bloc `paths-ignore`
+pour publier a chaque poussee quelle qu'elle soit.
+
+`fail-fast: false` : si une plateforme echoue, l'autre publie quand meme. Mieux
+vaut une version disponible sur un seul systeme que pas de version du tout.
+
+Pour publier a la main, sans passer par le depot :
 
 ```
 npm run release      # compile, empaquette macOS + Windows, publie la release
