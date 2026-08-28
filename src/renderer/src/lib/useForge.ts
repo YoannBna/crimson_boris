@@ -17,6 +17,8 @@ export interface ForgeState {
   busy: string | null
   error: string | null
   exported: string | null
+  /** Compte rendu de la derniere application de plan */
+  applied: string | null
 }
 
 export function useForge(deckKey: string | null) {
@@ -27,7 +29,8 @@ export function useForge(deckKey: string | null) {
     plan: null,
     busy: null,
     error: null,
-    exported: null
+    exported: null,
+    applied: null
   })
 
   // L'atelier se recharge quand le deck change d'identite.
@@ -105,6 +108,29 @@ export function useForge(deckKey: string | null) {
     [guard]
   )
 
+  /**
+   * Applique le plan au deck et recharge l'etabli.
+   * Le deck lui-meme est relu par le composant parent : c'est lui qui
+   * detient l'etat du deck courant.
+   */
+  const applyPlan = useCallback(
+    (onDeckChanged?: () => void) =>
+      guard('Application au deck…', async () => {
+        const res = await window.boris.forge.applyPlan()
+        const bench = await window.boris.forge.getWorkbench()
+        onDeckChanged?.()
+        return {
+          bench,
+          exported: null,
+          plan: null,
+          applied:
+            `Plan applique : ${res.removed} sortie(s), ${res.added} entree(s). ` +
+            `Le deck compte ${res.cards} cartes — version ${res.versionId} enregistree.`
+        }
+      }),
+    [guard]
+  )
+
   const exportPlan = useCallback(
     () =>
       guard('Ecriture du fichier…', async () => {
@@ -122,5 +148,15 @@ export function useForge(deckKey: string | null) {
     [guard]
   )
 
-  return { state, searchPool, planDirectives, commit, drop, clear, exportPlan, refreshAdvice }
+  return {
+    state,
+    searchPool,
+    planDirectives,
+    commit,
+    drop,
+    clear,
+    exportPlan,
+    applyPlan,
+    refreshAdvice
+  }
 }

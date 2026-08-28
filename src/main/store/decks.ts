@@ -51,3 +51,40 @@ export function runHistory(limit = 20): {
     )
     .all(limit) as { runAt: string; deckName: string; games: number; opponents: number }[]
 }
+
+/*
+ * Pile de versions.
+ *
+ * Chaque application de plan ajoute une ligne : l'historique est le
+ * tableau `decks` lui-meme. Revenir en arriere ne supprime rien — la
+ * version choisie est recopiee en tete, si bien qu'on peut toujours
+ * repartir en avant.
+ */
+
+export interface DeckRow {
+  id: number
+  name: string
+  imported_at: string
+  payload: string
+}
+
+export function deckVersions(limit = 40): DeckRow[] {
+  return getDb()
+    .prepare('SELECT id, name, imported_at, payload FROM decks ORDER BY id DESC LIMIT ?')
+    .all(limit) as DeckRow[]
+}
+
+export function deckById(id: number): ResolvedDeck | null {
+  const row = getDb().prepare('SELECT payload FROM decks WHERE id = ?').get(id) as
+    | { payload: string }
+    | undefined
+  return row ? (JSON.parse(row.payload) as ResolvedDeck) : null
+}
+
+/** Enregistre un deck et retourne l'identifiant de la version creee. */
+export function saveDeckReturningId(deck: ResolvedDeck): number {
+  const info = getDb()
+    .prepare('INSERT INTO decks (name, source_file, imported_at, payload) VALUES (?, ?, ?, ?)')
+    .run(deck.name, deck.sourceFile, deck.importedAt, JSON.stringify(deck))
+  return Number(info.lastInsertRowid)
+}

@@ -430,8 +430,19 @@ if (!app.requestSingleInstanceLock()) {
 } else {
   app.on('second-instance', () => revealWindow(true))
 
-  app.whenReady().then(() => {
+  app.whenReady().then(async () => {
     electronApp.setAppUserModelId('fr.crimson.boris')
+
+    // La suite de verification tourne dans l'application reelle — base,
+    // trousseau et reseau compris — puis rend la main sans rien demarrer.
+    const { testsRequested, runSelfTests, finish } = await import('./selftest')
+    if (testsRequested()) {
+      getDb()
+      await runSelfTests()
+      finish()
+      return
+    }
+
     applyContentSecurityPolicy()
     app.on('browser-window-created', (_, w) => optimizer.watchWindowShortcuts(w))
 
@@ -746,6 +757,23 @@ function registerForgeIpc(): void {
     clearChanges()
     const { deck } = await load()
     return snapshot(deck)
+  })
+
+  ipcMain.handle('forge:apply', async () => {
+    const { applyPlan } = await import('./forge/workbench')
+    const { deck } = await load()
+    if (!deck) throw new Error('Aucun deck importe.')
+    return applyPlan(deck)
+  })
+
+  ipcMain.handle('forge:history', async () => {
+    const { history } = await import('./forge/workbench')
+    return history()
+  })
+
+  ipcMain.handle('forge:revert', async (_e, versionId: number) => {
+    const { revertTo } = await import('./forge/workbench')
+    return revertTo(versionId)
   })
 
   ipcMain.handle('forge:export', async () => {

@@ -7,7 +7,9 @@ export function WorkbenchPanel({
   onDrop,
   onClear,
   onExport,
+  onApply,
   exported,
+  applied,
   busy
 }: {
   bench: Workbench | null
@@ -15,7 +17,9 @@ export function WorkbenchPanel({
   onDrop: (id: string) => void
   onClear: () => void
   onExport: () => void
+  onApply: () => void
   exported: string | null
+  applied: string | null
   busy: string | null
 }) {
   if (!bench || !hasDeck) {
@@ -58,8 +62,22 @@ export function WorkbenchPanel({
           <button className="btn ghost" onClick={onClear} disabled={Boolean(busy) || bench.changes.length === 0}>
             Vider
           </button>
-          <button className="btn" onClick={onExport} disabled={Boolean(busy) || bench.changes.length === 0}>
-            {busy ?? 'Exporter le plan'}
+          <button
+            className="btn ghost"
+            onClick={onExport}
+            disabled={Boolean(busy) || bench.changes.length === 0}
+          >
+            Exporter en fichier
+          </button>
+          {/* « Appliquer » modifie le deck charge et cree une version.
+              L'export seul n'ecrivait qu'un fichier : l'operateur validait
+              et ne voyait rien changer. */}
+          <button
+            className="btn"
+            onClick={onApply}
+            disabled={Boolean(busy) || bench.changes.length === 0}
+          >
+            {busy ?? 'Appliquer au deck'}
           </button>
         </div>
       </div>
@@ -82,6 +100,8 @@ export function WorkbenchPanel({
           </div>
         </>
       )}
+
+      {applied && <div className="bench-ok">✓ {applied}</div>}
 
       {exported && (
         <Note>

@@ -40,7 +40,8 @@ function highlight(body: string, strong: string[] = []) {
 }
 
 export function M04Arsenal() {
-  const { state, importFolder, importDialog, runSim, loadSuggestions, loadStyles } = useMtg()
+  const { state, importFolder, importDialog, runSim, loadSuggestions, loadStyles, reloadDeck } =
+    useMtg()
   const { deck, run, suggestions, styles, busy, error } = state
   const forge = useForge(deck ? `${deck.name}-${deck.importedAt}` : null)
   const [tab, setTab] = useState<Tab>('atelier')
@@ -96,7 +97,9 @@ export function M04Arsenal() {
                   onDrop={forge.drop}
                   onClear={forge.clear}
                   onExport={forge.exportPlan}
+                  onApply={() => void forge.applyPlan(() => void reloadDeck())}
                   exported={forge.state.exported}
+                  applied={forge.state.applied}
                   busy={forge.state.busy}
                 />
                 <AdvicePanel
@@ -139,6 +142,7 @@ export function M04Arsenal() {
                 run={run}
                 suggestions={suggestions}
                 onLoadSuggestions={loadSuggestions}
+                onCommit={forge.commit}
                 busy={busy}
               />
             )}

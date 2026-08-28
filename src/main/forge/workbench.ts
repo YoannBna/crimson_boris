@@ -1,8 +1,17 @@
 import { writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import type { Change, DirectivePlan, PoolQuery, PoolResult, Workbench } from '@shared/forge'
+import type {
+  ApplyResult,
+  Change,
+  DeckVersion,
+  DirectivePlan,
+  PoolQuery,
+  PoolResult,
+  Workbench
+} from '@shared/forge'
 import type { ResolvedDeck } from '@shared/mtg'
 import { search } from '../providers/scryfall'
+import { deckById, deckVersions, saveDeckReturningId } from '../store/decks'
 import { putCards } from '../store/cards'
 import { parseDirectives } from './directives'
 import { execute, type ExecContext } from './execute'
@@ -210,4 +219,85 @@ export async function exportPlan(
 
   await writeFile(path, [...header, ...lines.sort()].join('\n') + '\n', 'utf8')
   return { path, lines: lines.length }
+}
+
+/* ============================================================
+   Application du plan
+   ============================================================ */
+
+/**
+ * Applique le plan au deck et enregistre une nouvelle version.
+ *
+ * C'est ce que « valider » doit signifier. Auparavant, l'etabli
+ * n'ecrivait qu'un fichier d'export : l'operateur confirmait ses choix
+ * et ne voyait rien changer, parce que rien ne changeait effectivement
+ * dans le deck charge.
+ */
+export function applyPlan(deck: ResolvedDeck): ApplyResult {
+  const cut = new Set(
+    changes.filter((c) => c.kind === 'cut').map((c) => c.cardName.toLowerCase())
+  )
+  const added = changes.filter((c) => c.kind === 'add' && c.card !== null)
+
+  // Les exemplaires d'une meme carte partent ensemble : le format est
+  // singleton hors terrains basiques, et un retrait partiel n'aurait
+  // aucun sens pour les autres.
+  const main = deck.main.filter((c) => !cut.has(c.name.toLowerCase()))
+  // Compte les retraits AVANT les ajouts : mesurer la difference sur le
+  // tableau final melange les deux et sous-estime les coupes.
+  const removedCount = deck.main.length - main.length
+  for (const change of added) if (change.card) main.push(change.card)
+
+  const next: ResolvedDeck = {
+    ...deck,
+    main,
+    importedAt: new Date().toISOString()
+  }
+
+  const versionId = saveDeckReturningId(next)
+
+  // Le plan est consomme : le laisser en place ferait doublon a la
+  // prochaine application.
+  changes = []
+
+  return {
+    cards: main.length,
+    added: added.length,
+    removed: removedCount,
+    versionId
+  }
+}
+
+/** Pile des versions, la plus recente en tete. */
+export function history(): DeckVersion[] {
+  const rows = deckVersions()
+  return rows.map((r, i) => {
+    let cards = 0
+    try {
+      cards = (JSON.parse(r.payload) as ResolvedDeck).main.length
+    } catch {
+      cards = 0
+    }
+    return {
+      id: r.id,
+      name: r.name,
+      importedAt: r.imported_at,
+      cards,
+      label: i === 0 ? 'version courante' : `${cards} cartes`,
+      current: i === 0
+    }
+  })
+}
+
+/**
+ * Recharge une version anterieure.
+ * Elle est recopiee en tete plutot que restauree en place : rien n'est
+ * efface, et l'on peut toujours repartir en avant.
+ */
+export function revertTo(versionId: number): DeckVersion[] {
+  const target = deckById(versionId)
+  if (!target) throw new Error(`Version ${versionId} introuvable.`)
+  saveDeckReturningId({ ...target, importedAt: new Date().toISOString() })
+  changes = []
+  return history()
 }

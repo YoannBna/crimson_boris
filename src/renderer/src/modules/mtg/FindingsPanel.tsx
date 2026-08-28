@@ -1,4 +1,5 @@
 import type { Finding, FindingGrade, SimResult, Suggestion } from '@shared/mtg'
+import type { Change } from '@shared/forge'
 import { Card, Note } from '@/components/primitives'
 
 const GRADE_CLS: Record<FindingGrade, string> = {
@@ -12,11 +13,14 @@ export function FindingsPanel({
   run,
   suggestions,
   onLoadSuggestions,
+  onCommit,
   busy
 }: {
   run: SimResult
   suggestions: Record<string, Suggestion[]>
   onLoadSuggestions: () => void
+  /** Verse une carte suggeree a l'etabli */
+  onCommit?: (list: Omit<Change, 'id'>[]) => void
   busy: string | null
 }) {
   const actionable = run.findings.filter((f) => f.grade !== 'nominal')
@@ -41,7 +45,12 @@ export function FindingsPanel({
       </div>
 
       {run.findings.map((f) => (
-        <FindingRow key={f.id} finding={f} suggestions={suggestions[f.id] ?? []} />
+        <FindingRow
+          key={f.id}
+          finding={f}
+          suggestions={suggestions[f.id] ?? []}
+          onCommit={onCommit}
+        />
       ))}
 
       {actionable.length > 0 && !hasSuggestions && (
@@ -59,7 +68,15 @@ export function FindingsPanel({
   )
 }
 
-function FindingRow({ finding, suggestions }: { finding: Finding; suggestions: Suggestion[] }) {
+function FindingRow({
+  finding,
+  suggestions,
+  onCommit
+}: {
+  finding: Finding
+  suggestions: Suggestion[]
+  onCommit?: (list: Omit<Change, 'id'>[]) => void
+}) {
   return (
     <div className={`finding ${GRADE_CLS[finding.grade]}`}>
       <div className="finding-h">
@@ -88,6 +105,26 @@ function FindingRow({ finding, suggestions }: { finding: Finding; suggestions: S
                 <b>{s.card.priceEur !== null ? `${s.card.priceEur.toFixed(2)} €` : '— €'}</b>
                 <i>score {s.score}</i>
               </div>
+              {/* Une suggestion que l'on ne peut pas retenir n'est qu'un avis. */}
+              {onCommit && (
+                <button
+                  className="pool-add"
+                  title={`Verser ${s.card.name} a l'etabli`}
+                  onClick={() =>
+                    onCommit([
+                      {
+                        kind: 'add',
+                        cardName: s.card.name,
+                        card: s.card,
+                        because: `correctif : ${s.because}`,
+                        source: 'recommandation'
+                      }
+                    ])
+                  }
+                >
+                  +
+                </button>
+              )}
             </div>
           ))}
         </div>

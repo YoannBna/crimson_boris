@@ -37,7 +37,10 @@ const forge: ForgeAPI = {
   addChange: (change: Omit<Change, 'id'>) => ipcRenderer.invoke('forge:add', change),
   dropChange: (id: string) => ipcRenderer.invoke('forge:drop', id),
   clearChanges: () => ipcRenderer.invoke('forge:clear'),
-  exportPlan: () => ipcRenderer.invoke('forge:export')
+  exportPlan: () => ipcRenderer.invoke('forge:export'),
+  applyPlan: () => ipcRenderer.invoke('forge:apply'),
+  history: () => ipcRenderer.invoke('forge:history'),
+  revertTo: (versionId: number) => ipcRenderer.invoke('forge:revert', versionId)
 }
 
 const config: ConfigAPI = {

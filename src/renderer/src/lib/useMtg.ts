@@ -96,6 +96,16 @@ export function useMtg() {
     [guard]
   )
 
+  /** Relit le deck depuis la base — apres application d'un plan, par exemple. */
+  const reloadDeck = useCallback(async () => {
+    if (!hasBridge) return
+    const [deck, run] = await Promise.all([
+      window.boris.mtg.getDeck(),
+      window.boris.mtg.getLastRun()
+    ])
+    setState((s) => ({ ...s, deck, run }))
+  }, [])
+
   const loadStyles = useCallback(
     () =>
       guard('Recherche des impressions…', async () => ({
@@ -104,5 +114,5 @@ export function useMtg() {
     [guard]
   )
 
-  return { state, importFolder, importDialog, runSim, loadSuggestions, loadStyles }
+  return { state, importFolder, importDialog, runSim, loadSuggestions, loadStyles, reloadDeck }
 }

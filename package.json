@@ -2,7 +2,7 @@
   "name": "crimson-boris",
   "productName": "Crimson Boris",
   "version": "2.1.0",
-  "description": "Noyau analytique et executif — tableau de bord de bureau local",
+  "description": "Noyau analytique et executif \u2014 tableau de bord de bureau local",
   "author": "Crimson Boris",
   "license": "UNLICENSED",
   "private": true,
@@ -17,7 +17,8 @@
     "dev:web": "vite --config vite.web.config.ts",
     "dist:win": "npm run build && electron-builder --win --x64 --arm64",
     "dist:all": "npm run build && electron-builder --mac --win",
-    "release": "npm run build && electron-builder --mac --win --publish always"
+    "release": "npm run build && electron-builder --mac --win --publish always",
+    "test": "npm run build && electron out/main/index.js --hidden"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^9.6.0",

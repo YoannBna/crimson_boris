@@ -145,6 +145,28 @@ export interface PoolResult {
 
 /* --- API ---------------------------------------------------- */
 
+/** Une version du deck dans la pile d'historique. */
+export interface DeckVersion {
+  id: number
+  name: string
+  importedAt: string
+  /** Nombre de cartes du deck principal a cette version */
+  cards: number
+  /** Resume de ce qui a produit cette version */
+  label: string
+  /** true s'il s'agit de la version actuellement chargee */
+  current: boolean
+}
+
+export interface ApplyResult {
+  /** Deck resultant */
+  cards: number
+  added: number
+  removed: number
+  /** Identifiant de la version creee */
+  versionId: number
+}
+
 export interface ForgeAPI {
   getWorkbench(): Promise<Workbench | null>
   /** Analyse statique de la liste, hors simulation */
@@ -160,4 +182,14 @@ export interface ForgeAPI {
   clearChanges(): Promise<Workbench>
   /** Ecrit le plan dans un nouvel export, sans toucher au fichier d'origine */
   exportPlan(): Promise<{ path: string; lines: number }>
+  /**
+   * Applique le plan au deck : cree une nouvelle version et la charge.
+   * C'est ce que « valider » signifie — l'export seul ne changeait rien
+   * a ce que l'operateur avait sous les yeux.
+   */
+  applyPlan(): Promise<ApplyResult>
+  /** Pile des versions, de la plus recente a la plus ancienne */
+  history(): Promise<DeckVersion[]>
+  /** Recharge une version anterieure ou posterieure */
+  revertTo(versionId: number): Promise<DeckVersion[]>
 }

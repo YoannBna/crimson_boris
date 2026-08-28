@@ -219,6 +219,25 @@ Le binaire d'Electron ne sait pas ou trouver Boris : il ouvre alors son
 application de bienvenue. Utiliser les scripts ci-dessous, ou l'application
 empaquetee.
 
+## Verification du noyau
+
+```
+npm test                                   # 35 epreuves, reseau compris
+BORIS_TESTS=hors-ligne npm test            # sans les epreuves reseau
+```
+
+La suite s'execute dans l'application reelle — SQLite, trousseau du systeme
+et reseau compris — parce que c'est la que les defauts se logent. Les bugs les
+plus couteux de ce projet ont tous passe la compilation sans broncher :
+`autoUpdater` indefini dans le bundle empaquete, terrains engages comptes sur
+les noms distincts au lieu des exemplaires, et un plan valide qui n'ecrivait
+qu'un fichier sans jamais modifier le deck charge.
+
+Onze groupes : parseur d'exports, solveur de mana, generateur deterministe,
+classement des cartes, directives ecrites, comparaison de versions,
+persistance et chiffrement, moteur de gravite, etabli et historique,
+simulation, acces reseau.
+
 ## Commandes
 
 ```
