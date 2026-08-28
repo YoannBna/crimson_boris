@@ -1,0 +1,303 @@
+/* ============================================================
+   CRIMSON BORIS — SOCLE VISUEL
+   Environnement fluide, organique, formes octogonales
+   ============================================================ */
+
+:root {
+  /* --- Substrat : noir, mauve, orange brule --------------- */
+  --void:        #08070A;   /* fond le plus profond            */
+  --void-2:      #0E0B12;   /* creux                           */
+  --mauve-deep:  #1B0F26;   /* mauve d'ombre                   */
+  --mauve:       #3A1B52;   /* mauve structurel                */
+  --mauve-lit:   #6B2D8E;   /* mauve eclaire                   */
+  --violet:      #8B45C7;   /* violet des particules           */
+
+  --burnt:       #A33B0C;   /* orange brule                    */
+  --ember-2:     #E8590C;   /* braise                          */
+  --ember-lit:   #FF8A3D;   /* braise vive                     */
+  --gold-heat:   #FFC163;   /* chaleur du metal                */
+
+  --blood-2:     #C81E2D;   /* sang, conserve de la v2         */
+
+  /* --- Encre : blanc pur, exige par la charte ------------- */
+  --pure:        #FFFFFF;
+  --pure-soft:   rgba(255, 255, 255, .72);
+  --pure-faint:  rgba(255, 255, 255, .42);
+  --pure-ghost:  rgba(255, 255, 255, .16);
+
+  /* --- Lueurs --------------------------------------------- */
+  --glow-violet: 0 0 24px rgba(139, 69, 199, .45);
+  --glow-ember:  0 0 24px rgba(232, 89, 12, .45);
+  --glow-core:   0 0 40px rgba(255, 255, 255, .30);
+
+  /* --- Geometrie octogonale -------------------------------
+   * La coupe reste courte : un octogone franc ferait dur, alors
+   * qu'une entaille de quelques pixels adoucit l'angle sans
+   * effacer la forme. `--cut` se surcharge par composant.
+   */
+  --cut: 10px;
+  --cut-s: 6px;
+  --cut-l: 18px;
+
+  --octo: polygon(
+    var(--cut) 0%, calc(100% - var(--cut)) 0%,
+    100% var(--cut), 100% calc(100% - var(--cut)),
+    calc(100% - var(--cut)) 100%, var(--cut) 100%,
+    0% calc(100% - var(--cut)), 0% var(--cut)
+  );
+  --octo-s: polygon(
+    var(--cut-s) 0%, calc(100% - var(--cut-s)) 0%,
+    100% var(--cut-s), 100% calc(100% - var(--cut-s)),
+    calc(100% - var(--cut-s)) 100%, var(--cut-s) 100%,
+    0% calc(100% - var(--cut-s)), 0% var(--cut-s)
+  );
+  --octo-l: polygon(
+    var(--cut-l) 0%, calc(100% - var(--cut-l)) 0%,
+    100% var(--cut-l), 100% calc(100% - var(--cut-l)),
+    calc(100% - var(--cut-l)) 100%, var(--cut-l) 100%,
+    0% calc(100% - var(--cut-l)), 0% var(--cut-l)
+  );
+}
+
+/* ============================================================
+   FOND ANIME
+   Trois nappes de lumiere en derive lente. En CSS plutot qu'en
+   canvas : le fond ne doit rien coûter, l'avatar a besoin de
+   toute la marge de rendu.
+   ============================================================ */
+.aura {
+  position: fixed; inset: 0; z-index: -2; overflow: hidden;
+  background: var(--void);
+}
+.aura::before, .aura::after, .aura > i {
+  content: ""; position: absolute; border-radius: 50%;
+  filter: blur(70px); opacity: .55; will-change: transform;
+}
+.aura::before {
+  width: 62vw; height: 62vw; left: -14vw; top: -18vw;
+  background: radial-gradient(circle, var(--mauve-lit), transparent 68%);
+  animation: derive-a 34s ease-in-out infinite;
+}
+.aura::after {
+  width: 54vw; height: 54vw; right: -12vw; bottom: -16vw;
+  background: radial-gradient(circle, var(--burnt), transparent 66%);
+  animation: derive-b 42s ease-in-out infinite;
+}
+.aura > i {
+  width: 44vw; height: 44vw; left: 46%; top: 34%;
+  background: radial-gradient(circle, var(--mauve), transparent 70%);
+  animation: derive-c 52s ease-in-out infinite;
+  opacity: .4;
+}
+
+@keyframes derive-a {
+  0%, 100% { transform: translate(0, 0) scale(1) }
+  33%      { transform: translate(9vw, 7vh) scale(1.14) }
+  66%      { transform: translate(3vw, 13vh) scale(.94) }
+}
+@keyframes derive-b {
+  0%, 100% { transform: translate(0, 0) scale(1) }
+  40%      { transform: translate(-11vw, -8vh) scale(1.2) }
+  70%      { transform: translate(-4vw, -3vh) scale(.9) }
+}
+@keyframes derive-c {
+  0%, 100% { transform: translate(-50%, -50%) scale(1) }
+  50%      { transform: translate(-42%, -58%) scale(1.25) }
+}
+
+/* Grain fin : sans lui, les degrades se banderaient sur grand ecran. */
+.aura-grain {
+  position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: .045;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aura::before, .aura::after, .aura > i { animation: none }
+}
+
+/* ============================================================
+   SURFACES OCTOGONALES
+   ============================================================ */
+.oct {
+  position: relative;
+  clip-path: var(--octo);
+  /* Le conteneur porte la bordure : c'est le degrade lui-meme, revele
+   * par un pixel de marge autour du contenu. */
+  background: linear-gradient(
+    135deg,
+    rgba(139, 69, 199, .55), rgba(232, 89, 12, .38), rgba(139, 69, 199, .5)
+  );
+  background-size: 300% 300%;
+  animation: onde 9s ease-in-out infinite;
+  padding: 18px 20px;
+}
+.oct::before {
+  content: ""; position: absolute; inset: 1px;
+  clip-path: var(--octo);
+  background: linear-gradient(160deg, rgba(27, 15, 38, .93), rgba(12, 9, 16, .96));
+}
+.oct > * { position: relative; z-index: 1 }
+.oct.oct-s { clip-path: var(--octo-s) }
+.oct.oct-s::before { clip-path: var(--octo-s) }
+.oct.oct-l { clip-path: var(--octo-l) }
+.oct.oct-l::before { clip-path: var(--octo-l) }
+
+
+
+/* Vague lente sur la bordure : le liseré respire au lieu d'etre fige. */
+@keyframes onde {
+  0%, 100% { background-position: 0% 50% }
+  50%      { background-position: 100% 50% }
+}
+
+.oct-warm {
+  background: linear-gradient(
+    135deg,
+    rgba(232, 89, 12, .6), rgba(255, 193, 99, .35), rgba(163, 59, 12, .55)
+  );
+  background-size: 300% 300%;
+}
+.oct-cold {
+  background: linear-gradient(
+    135deg,
+    rgba(107, 45, 142, .6), rgba(139, 69, 199, .3), rgba(58, 27, 82, .6)
+  );
+  background-size: 300% 300%;
+}
+
+/* ============================================================
+   BOUTONS
+   ============================================================ */
+/*
+ * Meme principe que les surfaces : le bouton porte le degrade, un
+ * pseudo-element decale d'un pixel porte le fond sombre. Deux calques
+ * empiles au meme inset se masquaient l'un l'autre et le liseré ne se
+ * voyait nulle part.
+ */
+.oct-btn {
+  position: relative; display: inline-flex; align-items: center; gap: 9px;
+  font: inherit; font-size: 10px; letter-spacing: .18em; text-transform: uppercase;
+  font-weight: 700; color: var(--pure); cursor: pointer;
+  padding: 10px 22px; border: none;
+  clip-path: var(--octo-s);
+  background: linear-gradient(135deg, var(--violet), var(--ember-2), var(--violet));
+  background-size: 300% 300%;
+  animation: onde 7s ease-in-out infinite;
+  transition: transform .2s ease, filter .2s ease;
+}
+.oct-btn::before {
+  content: ""; position: absolute; inset: 1px;
+  clip-path: var(--octo-s);
+  background: linear-gradient(135deg, rgba(34, 19, 48, .96), rgba(14, 11, 18, .97));
+  transition: background .2s ease;
+}
+.oct-btn > *, .oct-btn { z-index: 0 }
+.oct-btn { isolation: isolate }
+.oct-btn::before { z-index: -1 }
+
+.oct-btn:hover {
+  transform: translateY(-1px);
+  filter: drop-shadow(0 4px 16px rgba(139, 69, 199, .4));
+  animation-duration: 2.6s;
+}
+.oct-btn:hover::before {
+  background: linear-gradient(135deg, rgba(48, 26, 68, .96), rgba(20, 15, 26, .97));
+}
+.oct-btn:disabled { opacity: .4; cursor: default; transform: none; filter: none }
+
+.oct-btn-warm {
+  background: linear-gradient(135deg, var(--ember-2), var(--gold-heat), var(--burnt));
+  background-size: 300% 300%;
+}
+.oct-btn-warm:hover { filter: drop-shadow(0 4px 16px rgba(232, 89, 12, .45)) }
+
+
+
+/* ============================================================
+   TEXTE
+   ============================================================ */
+.j-title {
+  font-size: 13px; letter-spacing: .3em; text-transform: uppercase;
+  font-weight: 700; color: var(--pure);
+}
+.j-body { font-size: 12.5px; line-height: 1.65; color: var(--pure-soft) }
+.j-dim  { font-size: 11px; color: var(--pure-faint); letter-spacing: .08em }
+
+/* ============================================================
+   AVATAR
+   ============================================================ */
+.avatar-wrap { position: relative; display: grid; place-items: center }
+.avatar-canvas { display: block; cursor: pointer; user-select: none }
+
+/*
+ * Cadre, pas fond plein.
+ *
+ * `clip-path` ouvre un contexte d'empilement : un pseudo-element en
+ * z-index negatif s'y place entre le fond du parent et son contenu,
+ * masquant ce fond au lieu de passer derriere. Le degrade tient donc le
+ * conteneur, et le fond sombre est porte par le contenu, decale d'un
+ * pixel — ce qui laisse voir le liseré tout autour.
+ */
+.avatar-hello {
+  position: absolute; top: calc(100% - 4px); left: 50%; transform: translateX(-50%);
+  white-space: nowrap;
+  clip-path: var(--octo-s);
+  background: linear-gradient(135deg, var(--violet), var(--ember-2));
+  padding: 1px;
+  animation: salut 5.2s ease-in-out forwards;
+  filter: drop-shadow(0 0 18px rgba(139, 69, 199, .45));
+  pointer-events: none;
+}
+.avatar-hello > span {
+  display: block; padding: 8px 18px;
+  clip-path: var(--octo-s);
+  background: linear-gradient(135deg, rgba(20, 12, 28, .97), rgba(12, 9, 16, .98));
+  color: var(--pure); font-size: 12px; letter-spacing: .12em;
+}
+
+@keyframes salut {
+  0%        { opacity: 0; transform: translate(-50%, 10px) }
+  12%, 78%  { opacity: 1; transform: translate(-50%, 0) }
+  100%      { opacity: 0; transform: translate(-50%, -6px) }
+}
+
+/* Deplacement fluide vers le haut, a l'activation. */
+.avatar-dock {
+  position: fixed; left: 50%; top: 26px; transform: translateX(-50%);
+  z-index: 50; transition: top .9s cubic-bezier(.22, 1, .36, 1),
+                           transform .9s cubic-bezier(.22, 1, .36, 1);
+}
+.avatar-dock.centre {
+  top: 50%; transform: translate(-50%, -50%);
+}
+
+/* ============================================================
+   COQUILLE
+   ============================================================ */
+.jarvis { min-height: 100vh; position: relative; overflow-x: hidden }
+
+.jarvis-hint {
+  position: fixed; left: 50%; bottom: 8vh; transform: translateX(-50%);
+  letter-spacing: .22em; text-transform: uppercase; font-size: 9.5px;
+  animation: respire 3.6s ease-in-out infinite;
+}
+@keyframes respire { 0%, 100% { opacity: .35 } 50% { opacity: .8 } }
+
+.jarvis-scene {
+  padding: 200px 6vw 60px;
+  display: grid; gap: 22px;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  animation: monte .7s cubic-bezier(.22, 1, .36, 1) both;
+}
+@keyframes monte {
+  from { opacity: 0; transform: translateY(22px) }
+  to   { opacity: 1; transform: none }
+}
+
+.jarvis-card { display: grid; gap: 10px; align-content: start; min-height: 150px }
+.jarvis-card .j-body { margin: 0 }
+
+.jarvis-actions {
+  grid-column: 1 / -1; display: flex; gap: 12px; justify-content: center;
+  margin-top: 10px;
+}

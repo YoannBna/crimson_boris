@@ -53,10 +53,15 @@ export function createWindow(show: boolean): BrowserWindow {
     if (process.platform === 'darwin') app.dock?.hide()
   })
 
+  // `BORIS_JARVIS` monte la coquille de la refonte, le temps que ses
+  // etapes soient livrees.
+  const query = process.env['BORIS_JARVIS'] ? { search: '?jarvis' } : {}
+
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    void win.loadURL(process.env['ELECTRON_RENDERER_URL'])
+    const url = process.env['ELECTRON_RENDERER_URL'] + (query.search ?? '')
+    void win.loadURL(url)
   } else {
-    void win.loadFile(join(__dirname, '../renderer/index.html'))
+    void win.loadFile(join(__dirname, '../renderer/index.html'), query)
   }
 
   return win
