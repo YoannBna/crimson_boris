@@ -53,9 +53,9 @@ export function createWindow(show: boolean): BrowserWindow {
     if (process.platform === 'darwin') app.dock?.hide()
   })
 
-  // `BORIS_JARVIS` monte la coquille de la refonte, le temps que ses
-  // etapes soient livrees.
-  const query = process.env['BORIS_JARVIS'] ? { search: '?jarvis' } : {}
+  // `BORIS_LEGACY` rouvre l'ancienne interface, conservee le temps de
+  // quelques versions. Sans lui, c'est la coquille qui se monte.
+  const query = process.env['BORIS_LEGACY'] ? { search: '?legacy' } : {}
 
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     const url = process.env['ELECTRON_RENDERER_URL'] + (query.search ?? '')

@@ -68,6 +68,11 @@ export function Marches({
         </p>
       </Bloc>
 
+      <p className="jv-legal">
+        Données de marché indicatives, relevées auprès d'une source publique. Aucune
+        recommandation d'investissement.
+      </p>
+
       {chocs.length > 0 && (
         <Bloc titre={`Chocs du dernier cycle · ${chocs.length}`} ton="chaud">
           {chocs.map((h) => (

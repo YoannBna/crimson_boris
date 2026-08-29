@@ -158,7 +158,7 @@ journalise :
 
 ### Indicateur de synchronisation
 
-En bas a droite de l'interface, une pastille discrete affiche la version et
+En haut a droite de l'interface, une pastille discrete affiche la version et
 s'ouvre au clic : etat, version locale, version publiee, horodatage de
 compilation, derniere verification. Les etats sont honnetes — `depot injoignable`
 et `aucun depot declare` sont affiches tels quels, jamais masques derriere un
@@ -268,14 +268,41 @@ src/
 ├─ shared/      contrat main <-> renderer
 └─ renderer/
    └─ src/
-      ├─ styles/      tokens.css (design system) + base.css + modules.css
-      ├─ components/  primitives reutilisables
+      ├─ styles/      tokens.css + base.css + modules.css (ancienne interface)
+      │               jarvis.css + forge.css + shell.css (coquille)
+      ├─ components/  primitives reutilisables + avatar + aura
+      ├─ nav/         carte des constellations
+      ├─ forge/       mode Forge : deck, trois volets, inspection, arts
+      ├─ opti/        mode Opti : marches, veille, courrier, actions, asymetries
+      ├─ shell/       porte d'entree, profil, version, etat du noyau
       ├─ data/        contenu et jeux de donnees des modules
       ├─ modules/     M01 Actualites · M02 Radar · M03 Courrier · M04 Arsenal
+      │               (ancienne interface, atteignable par ?legacy)
       └─ lib/         hooks
 legacy/          version v1 monofichier, conservee pour reference
 scripts/         outillage (capture de controle)
 ```
+
+## Interface
+
+Boris s'ouvre sur son avatar et deux voies : **Opti** (marches, veille, courrier,
+actions, asymetries) et **Forge** (Magic). Chaque mode presente ses categories en
+constellation — tout est pose d'un coup, rien derriere un menu. Un clic ouvre une
+categorie en grand ; la constellation se replie dans un coin et sert de repere. On
+remonte d'un cran par un clic dans le vide, par la fleche flottante ou par Echap.
+
+Le mode Forge occupe l'ecran : le deck a gauche, un volet a trois modes a droite
+(Analyse, Simulation, Construction) et la pile des versions en bas. Survoler une
+carte la sort du paquet ; cliquer ouvre son inspection et la liste de ses
+impressions avec leurs prix.
+
+L'ancienne interface — bandeau et quatre modules empiles — reste atteignable :
+
+```
+BORIS_LEGACY=1 npx electron out/main/index.js    # ou ?legacy dans l'URL
+```
+
+Elle sera retiree quand la coquille aura tourne quelques versions sans manque.
 
 ## Design system
 
@@ -289,6 +316,8 @@ jade reserve aux statuts positifs et aux donnees financieres en hausse.
 - [x] **Etape 2** — projet initialise, v1 migree vers la palette abyssale
 - [x] **Etape 3** — process de fond : tray, scheduler, detection de sortie de veille
 - [x] **Etape 4** — module MTG : simulateur + integration Scryfall
+- [x] **Refonte** — coquille en constellations : avatar, deux modes, dix volets,
+      inspection des cartes et illustrations alternatives
 
 ## Cycle de vie
 

@@ -64,6 +64,11 @@ export function Asymetries({ snapshot }: { snapshot: MarketSnapshot | null }) {
             )
           })}
         </div>
+
+        <p className="jv-legal">
+          Données de marché indicatives. Les thèses ci-dessus sont des paris écrits à la main,
+          pas des analyses : aucune recommandation d'investissement.
+        </p>
       </Bloc>
     </div>
   )

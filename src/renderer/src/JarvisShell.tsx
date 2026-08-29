@@ -11,6 +11,7 @@ import { hasBridge, useCoreStatus } from './lib/useBoris'
 import { useConfig } from './lib/useConfig'
 import { Porte } from './shell/Porte'
 import { Profil } from './shell/Profil'
+import { EtatCycle } from './shell/EtatCycle'
 import { Version } from './shell/Version'
 
 /*
@@ -189,6 +190,8 @@ export function JarvisShell() {
 
       {/* --- Barre permanente ------------------------------------- */}
       <div className="jv-barre" onClick={(e) => e.stopPropagation()}>
+        <EtatCycle status={status} />
+
         {/* La pastille vit hors du bouton : le `clip-path` octogonal de
             `oct-btn` rogne ses descendants, et elle y perdait un coin. */}
         <span className="jv-profil">

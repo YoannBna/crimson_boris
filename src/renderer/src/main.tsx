@@ -9,14 +9,17 @@ import './styles/forge.css'
 import './styles/shell.css'
 
 /*
- * Refonte en cours : la nouvelle coquille se monte a la place de
- * l'ancienne quand `BORIS_JARVIS` est defini. Tant que les etapes ne
- * sont pas toutes livrees, l'application en service reste intacte.
+ * La coquille en constellations est desormais l'interface de Boris.
+ *
+ * L'ancienne reste atteignable derriere `?legacy`, et le restera le
+ * temps de quelques versions : elle a tourne des mois, la nouvelle
+ * quelques jours. Une porte de sortie coute une ligne ; s'en passer
+ * coute une reinstallation le jour ou quelque chose manque.
  */
-const refonte =
+const ancienne =
   typeof window !== 'undefined' &&
-  new URLSearchParams(window.location.search).has('jarvis')
+  new URLSearchParams(window.location.search).has('legacy')
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>{refonte ? <JarvisShell /> : <App />}</StrictMode>
+  <StrictMode>{ancienne ? <App /> : <JarvisShell />}</StrictMode>
 )
