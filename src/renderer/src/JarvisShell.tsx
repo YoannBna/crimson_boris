@@ -7,7 +7,11 @@ import { ForgeLogo } from './forge/ForgeLogo'
 import { ForgeWorkspace } from './forge/ForgeWorkspace'
 import { OptiVolet } from './opti/OptiVolet'
 import { MODES, findMode, type ModeId } from './nav/map'
-import { useCoreStatus } from './lib/useBoris'
+import { hasBridge, useCoreStatus } from './lib/useBoris'
+import { useConfig } from './lib/useConfig'
+import { Porte } from './shell/Porte'
+import { Profil } from './shell/Profil'
+import { Version } from './shell/Version'
 
 /*
  * Coquille de la refonte.
@@ -41,12 +45,15 @@ function salutation(trigger: TriggerSource | undefined, nom: string): string {
 
 type Depth = 'accueil' | 'constellation' | 'focus'
 
-export function JarvisShell({ operateur = '' }: { operateur?: string }) {
+export function JarvisShell() {
   const status = useCoreStatus()
+  const { config, busy, error, run } = useConfig()
   const [mode, setMode] = useState<ModeId | null>(null)
   const [focus, setFocus] = useState<string | null>(null)
   const [message, setMessage] = useState<string | null>(null)
+  const [profil, setProfil] = useState(false)
 
+  const operateur = config?.profile.displayName ?? ''
   const depth: Depth = mode === null ? 'accueil' : focus === null ? 'constellation' : 'focus'
 
   useEffect(() => {
@@ -73,8 +80,34 @@ export function JarvisShell({ operateur = '' }: { operateur?: string }) {
     return () => window.removeEventListener('keydown', onKey)
   }, [remonter])
 
+  // Tant que la configuration n'est pas lue, rien ne s'affiche : mieux
+  // vaut un instant vide qu'une constellation qui clignote avant de
+  // ceder la place a la porte d'entree.
+  if (hasBridge && !config) return null
+
+  if (hasBridge && config && !config.onboarded) {
+    return (
+      <Porte
+        config={config}
+        busy={busy}
+        error={error}
+        onSecret={(c, key, value) =>
+          void run(() => window.boris.config.setSecret(c, key, value))
+        }
+        onSkip={(c) => void run(() => window.boris.config.skipConnector(c))}
+        onProfile={(displayName) =>
+          void run(() => window.boris.config.saveProfile({ displayName }))
+        }
+        onComplete={() => void run(() => window.boris.config.complete())}
+      />
+    )
+  }
+
   const courant = mode ? findMode(mode) : null
   const noeud = courant && focus ? courant.nodes.find((n) => n.id === focus) : null
+  // Un connecteur ni relie ni ecarte reste une decision en suspens : la
+  // pastille le rappelle sans rien bloquer.
+  const enAttente = config?.connectors.filter((c) => c.state === 'absent').length ?? 0
 
   // Les deux modes ouvrent desormais un volet plein cadre : la
   // constellation reduite se replie dans le coin bas-droit, seul creux
@@ -152,6 +185,50 @@ export function JarvisShell({ operateur = '' }: { operateur?: string }) {
 
       {depth === 'accueil' && (
         <div className="jarvis-hint j-dim">choisis une voie</div>
+      )}
+
+      {/* --- Barre permanente ------------------------------------- */}
+      <div className="jv-barre" onClick={(e) => e.stopPropagation()}>
+        {/* La pastille vit hors du bouton : le `clip-path` octogonal de
+            `oct-btn` rogne ses descendants, et elle y perdait un coin. */}
+        <span className="jv-profil">
+          <button
+            className="jv-profil-btn oct-btn"
+            onClick={() => setProfil(true)}
+            title="Profil et parametres"
+          >
+            {operateur.trim() === '' ? 'Profil' : operateur}
+          </button>
+          {enAttente > 0 && (
+            <span className="jv-pastille" title={`${enAttente} connecteur(s) en attente`}>
+              {enAttente}
+            </span>
+          )}
+        </span>
+        <Version />
+      </div>
+
+      {profil && config && (
+        <Profil
+          config={config}
+          busy={busy}
+          error={error}
+          onSecret={(c, key, value) =>
+            void run(() => window.boris.config.setSecret(c, key, value))
+          }
+          onClear={(c) => void run(() => window.boris.config.clearConnector(c))}
+          onProfile={(patch) => void run(() => window.boris.config.saveProfile(patch))}
+          onPurge={() =>
+            void run(async () => {
+              await window.boris.config.purge()
+              // Le profil disparait : on relit l'etat plutot que de
+              // laisser un panneau decrire des donnees effacees.
+              setProfil(false)
+              return window.boris.config.get()
+            })
+          }
+          onFermer={() => setProfil(false)}
+        />
       )}
     </div>
   )

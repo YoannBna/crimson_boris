@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import type { CoreStatus, Severity, TriggerSource } from '@shared/types'
-import type { AppConfig, ConnectorId } from '@shared/config'
+import type { ConnectorId } from '@shared/config'
 import { DEFAULT_PROFILE } from '@shared/config'
 import { hasBridge, useCoreStatus } from './lib/useBoris'
+import { useConfig } from './lib/useConfig'
 import { SyncBadge } from './components/SyncBadge'
 import { Onboarding } from './Onboarding'
 import { Settings } from './Settings'
@@ -60,37 +61,6 @@ function SignalBar({ status }: { status: CoreStatus }) {
       ))}
     </div>
   )
-}
-
-/**
- * Charge la configuration et barre le tableau de bord tant que l'accueil
- * n'a pas ete valide. Hors coquille Electron, on considere l'accueil
- * comme passe : il n'y a alors ni secret ni connecteur a regler.
- */
-function useConfig() {
-  const [config, setConfig] = useState<AppConfig | null>(null)
-  const [busy, setBusy] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    if (!hasBridge) return
-    void window.boris.config.get().then(setConfig)
-  }, [])
-
-  const run = async (fn: () => Promise<AppConfig | void>): Promise<void> => {
-    setBusy(true)
-    setError(null)
-    try {
-      const next = await fn()
-      if (next) setConfig(next)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : String(err))
-    } finally {
-      setBusy(false)
-    }
-  }
-
-  return { config, busy, error, setConfig, run }
 }
 
 export default function App() {

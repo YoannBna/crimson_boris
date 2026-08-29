@@ -26,11 +26,12 @@
  * refonte s'en affranchissent. La remise a zero vient AVANT leurs
  * regles propres — a specificite egale, c'est la derniere qui gagne.
  */
-.fd-head, .opti-head, .insp-h {
+.fd-head, .opti-head, .insp-h, .jv-f-head, .jv-p-head {
   border: none; background: none; box-shadow: none;
   padding: 0; margin: 0; overflow: visible;
 }
-.fd-head::after, .opti-head::after, .insp-h::after { content: none }
+.fd-head::after, .opti-head::after, .insp-h::after,
+.jv-f-head::after, .jv-p-head::after { content: none }
 
 .forge-deck { grid-column: 1; grid-row: 1 }
 .forge-side { grid-column: 2; grid-row: 1 }
