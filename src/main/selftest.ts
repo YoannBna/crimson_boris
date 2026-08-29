@@ -454,6 +454,67 @@ async function buildCases(): Promise<Case[]> {
     repereDecks = -1
   })
 
+  /* ---------- Forge : illustrations ----------
+   * L'art est range hors du deck : revenir a une version anterieure ne
+   * doit pas defaire un choix graphique.
+   */
+  add('Forge — arts', 'un art choisi survit au changement de version', async () => {
+    const { allArts, chooseArt, clearArt } = await import('./store/arts')
+    const { saveDeck, latestDeck, dropDeckVersionsAfter, lastDeckId } = await import('./store/decks')
+    const nom = '__epreuve-art__'
+
+    clearArt(nom)
+    const repere = lastDeckId()
+    chooseArt({
+      cardName: nom,
+      scryfallId: 's-1',
+      setCode: 'XYZ',
+      setName: 'Epreuve',
+      collectorNumber: '42',
+      artist: 'Personne',
+      imageNormal: null,
+      priceEur: 1.5
+    })
+
+    saveDeck(fauxDeck(12))
+    assert(latestDeck()?.main.length === 12, 'nouvelle version chargee')
+    eq(allArts()[nom]?.setCode, 'XYZ', 'l’art survit a l’empilement d’une version')
+
+    dropDeckVersionsAfter(repere)
+    eq(allArts()[nom]?.collectorNumber, '42', 'et au retour en arriere')
+
+    clearArt(nom)
+    assert(allArts()[nom] === undefined, 'le retrait rend la carte a son impression d’origine')
+  })
+
+  add('Forge — arts', 'l’export porte l’impression retenue', async () => {
+    const { readFile, unlink } = await import('node:fs/promises')
+    const { tmpdir } = await import('node:os')
+    const wb = await import('./forge/workbench')
+    const { chooseArt, clearArt } = await import('./store/arts')
+
+    const deck = fauxDeck(3)
+    chooseArt({
+      cardName: 'c1',
+      scryfallId: 's-2',
+      setCode: 'XYZ',
+      setName: 'Epreuve',
+      collectorNumber: '77',
+      artist: null,
+      imageNormal: null,
+      priceEur: null
+    })
+
+    wb.clearChanges()
+    const { path } = await wb.exportPlan(deck, tmpdir())
+    const texte = await readFile(path, 'utf8')
+    await unlink(path)
+    clearArt('c1')
+
+    assert(texte.includes('1x c1 (XYZ) 77'), `impression absente de l’export :\n${texte}`)
+    assert(texte.includes('1x c0\n') || texte.includes('1x c0\r'), 'les autres lignes restent nues')
+  })
+
   /* ---------- Simulation ---------- */
   add('Simulation', 'produit des parties exploitables', async () => {
     const { simulate } = await import('./sim/engine')
@@ -538,6 +599,24 @@ async function buildCases(): Promise<Case[]> {
       assert(
         deck.categories?.['Edgar Markov'] === undefined,
         'le commandant ne porte que des etiquettes de structure'
+      )
+    },
+    true
+  )
+
+  add(
+    'Reseau',
+    'les impressions arrivent de la moins chere a la plus chere',
+    async () => {
+      const { printings } = await import('./providers/scryfall')
+      const p = await printings('Sol Ring')
+      const prix = p.map((x) => x.priceEur).filter((x): x is number => x !== null)
+      assert(prix.length > 2, 'plusieurs impressions cotees')
+      // La vue d'inspection presente la liste telle quelle : si l'ordre
+      // se perdait, le choix « le moins cher » ne serait plus en tete.
+      assert(
+        prix.every((v, i) => i === 0 || prix[i - 1] <= v),
+        `ordre rompu : ${prix.slice(0, 8).join(', ')}`
       )
     },
     true

@@ -1,7 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import type { Card, Printing } from '@shared/mtg'
+import { useArts } from '@/lib/useArts'
 import { useForge } from '@/lib/useForge'
 import { useMtg } from '@/lib/useMtg'
 import { DeckColonne } from './DeckColonne'
+import { Inspecteur } from './Inspecteur'
 import { PileVersions } from './PileVersions'
 import { VoletAnalyse } from './VoletAnalyse'
 import { VoletConstruction } from './VoletConstruction'
@@ -30,30 +33,50 @@ const TITRES: Record<Volet, string> = {
  * ne doit pas enfermer dans l'analyse.
  */
 export function ForgeWorkspace({ noeud }: { noeud: string | null }) {
-  const { state: mtg, runSim, loadSuggestions, reloadDeck, importFolder } = useMtg()
+  const { state: mtg, runSim, loadSuggestions, loadStyles, reloadDeck, importFolder } = useMtg()
   const deck = mtg.deck
   const forge = useForge(deck ? `${deck.name}-${deck.importedAt}` : null)
+  const { arts, busy: artsBusy, choisir, retirer } = useArts()
 
   const [volet, setVolet] = useState<Volet>('analyse')
+  const [inspecte, setInspecte] = useState<Card | null>(null)
 
   useEffect(() => {
     if (noeud === 'analyse' || noeud === 'simulation' || noeud === 'construction') {
       setVolet(noeud)
     }
+    // « Arts » n'est pas un quatrieme volet : c'est un module de
+    // Construction, et le noeud y mene directement.
+    if (noeud === 'arts') setVolet('construction')
   }, [noeud])
+
+  const choisirArt = useCallback(
+    (cardName: string, p: Printing) => void choisir(cardName, p),
+    [choisir]
+  )
 
   // Hors des categories de la Forge, le poste ne s'affiche pas — mais il
   // reste monte, et son etat avec lui.
   const ouvert =
-    noeud === 'deck' || noeud === 'analyse' || noeud === 'simulation' || noeud === 'construction'
+    noeud === 'deck' ||
+    noeud === 'analyse' ||
+    noeud === 'simulation' ||
+    noeud === 'construction' ||
+    noeud === 'arts'
   if (!ouvert) return null
 
-  const busy = mtg.busy ?? forge.state.busy
+  const busy = mtg.busy ?? forge.state.busy ?? (artsBusy ? 'Enregistrement de l’art…' : null)
   const erreur = mtg.error ?? forge.state.error
 
   return (
     <div className="forge-work" onClick={(e) => e.stopPropagation()}>
-      <DeckColonne deck={deck} busy={mtg.busy} onImport={() => void importFolder()} />
+      <DeckColonne
+        deck={deck}
+        arts={arts}
+        busy={mtg.busy}
+        onImport={() => void importFolder()}
+        onInspecter={setInspecte}
+      />
 
       <section className="oct forge-side">
         <div className="fs-onglets">
@@ -96,13 +119,18 @@ export function ForgeWorkspace({ noeud }: { noeud: string | null }) {
               run={mtg.run}
               advice={forge.state.advice}
               suggestions={mtg.suggestions}
+              styles={mtg.styles}
+              arts={arts}
               pool={forge.state.pool}
               plan={forge.state.plan}
               bench={forge.state.bench}
               busy={busy}
               exported={forge.state.exported}
               applied={forge.state.applied}
+              sourceInitiale={noeud === 'arts' ? 'arts' : 'auto'}
               onSuggestions={() => void loadSuggestions()}
+              onStyles={() => void loadStyles()}
+              onChoisirArt={choisirArt}
               onSearch={(text, legalOnly, maxPrice) =>
                 void forge.searchPool({ text, legalOnly, maxPrice })
               }
@@ -124,6 +152,16 @@ export function ForgeWorkspace({ noeud }: { noeud: string | null }) {
         busy={busy}
         onCharger={(id) => void forge.revertTo(id, () => void reloadDeck())}
       />
+
+      {inspecte && (
+        <Inspecteur
+          card={inspecte}
+          art={arts[inspecte.name]}
+          onChoisir={(p) => void choisir(inspecte.name, p)}
+          onRetirer={() => void retirer(inspecte.name)}
+          onFermer={() => setInspecte(null)}
+        />
+      )}
     </div>
   )
 }

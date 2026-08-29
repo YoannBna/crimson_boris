@@ -125,11 +125,17 @@
 @media (max-width: 1180px) { .fd-cartes { columns: 3 } }
 
 .fd-carte {
-  display: flex; align-items: center; gap: 7px;
+  display: flex; align-items: center; gap: 7px; width: 100%;
   break-inside: avoid; padding: 2px 3px; font-size: 11.5px;
+  font: inherit; font-size: 11.5px; text-align: left;
+  background: none; border: none; cursor: pointer;
   color: var(--pure-soft);
+  transition: background .15s ease, color .15s ease, transform .15s ease;
 }
-.fd-carte:hover { background: rgba(255, 255, 255, .05); color: var(--pure) }
+.fd-carte:hover, .fd-carte:focus-visible {
+  background: rgba(255, 255, 255, .07); color: var(--pure);
+  transform: translateX(3px); outline: none;
+}
 .fd-n { width: 16px; font-size: 9.5px; color: var(--gold-heat); flex: 0 0 auto }
 .fd-nom { flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
 .fd-prix { flex: 0 0 auto; font-size: 9.5px; color: var(--pure-faint); min-width: 30px; text-align: right }
@@ -431,17 +437,182 @@
    invisible fait perdre le reperage. Un filet suffit.
    ============================================================ */
 .fd-liste::-webkit-scrollbar,
+.insp-grille::-webkit-scrollbar,
 .vp::-webkit-scrollbar,
 .vc-source::-webkit-scrollbar,
 .vce-liste::-webkit-scrollbar,
 .pile-liste::-webkit-scrollbar { width: 5px; height: 5px }
 .fd-liste::-webkit-scrollbar-thumb,
+.insp-grille::-webkit-scrollbar-thumb,
 .vp::-webkit-scrollbar-thumb,
 .vc-source::-webkit-scrollbar-thumb,
 .vce-liste::-webkit-scrollbar-thumb,
 .pile-liste::-webkit-scrollbar-thumb { background: rgba(232, 89, 12, .35) }
 .fd-liste::-webkit-scrollbar-track,
+.insp-grille::-webkit-scrollbar-track,
 .vp::-webkit-scrollbar-track,
 .vc-source::-webkit-scrollbar-track,
 .vce-liste::-webkit-scrollbar-track,
 .pile-liste::-webkit-scrollbar-track { background: rgba(255, 255, 255, .03) }
+
+
+/* ============================================================
+   CARTE TIREE DU PAQUET
+   Au survol d'une ligne, la carte sort entierement de la pile.
+   Rendue dans le body : le volet porte un clip-path, qui rognerait
+   une carte pourtant fixee.
+   ============================================================ */
+.fd-apercu {
+  position: fixed; z-index: 60; pointer-events: none;
+  border-radius: 12px; overflow: visible;
+  filter: drop-shadow(0 18px 40px rgba(0, 0, 0, .75))
+          drop-shadow(0 0 26px rgba(232, 89, 12, .28));
+  animation: sort-du-paquet .26s cubic-bezier(.22, 1, .36, 1) both;
+}
+.fd-apercu img { width: 100%; height: 100%; object-fit: contain; border-radius: 12px }
+@keyframes sort-du-paquet {
+  from { opacity: 0; transform: translateX(-14px) scale(.9) rotate(-2.5deg) }
+  to   { opacity: 1; transform: none }
+}
+.fd-apercu-badge {
+  position: absolute; right: 10px; top: 10px;
+  display: grid; place-items: center; padding: 4px;
+  background: rgba(12, 9, 16, .82); clip-path: var(--octo-s);
+}
+
+/* ============================================================
+   BADGE PINCEAU
+   Orange pale : reperable sur cent lignes, sans concurrencer
+   l'illustration qu'il signale.
+   ============================================================ */
+.pinceau {
+  display: inline-grid; place-items: center; flex: 0 0 auto;
+  color: #F2B183;
+}
+.pinceau svg { width: 100%; height: 100%; display: block }
+
+/* ============================================================
+   VUE D'INSPECTION
+   ============================================================ */
+.insp-fond {
+  position: fixed; inset: 0; z-index: 80;
+  display: grid; place-items: center;
+  background: rgba(8, 7, 10, .82);
+  backdrop-filter: blur(3px);
+  animation: voile .25s ease both;
+}
+@keyframes voile { from { opacity: 0 } to { opacity: 1 } }
+
+.insp {
+  display: grid; grid-template-columns: 300px minmax(0, 1fr);
+  gap: 22px; width: min(1020px, 92vw); max-height: 86vh;
+  padding: 20px 22px;
+  animation: pose-carte .38s cubic-bezier(.22, 1, .36, 1) both;
+}
+@keyframes pose-carte {
+  from { opacity: 0; transform: translateY(22px) scale(.97) }
+  to   { opacity: 1; transform: none }
+}
+@media (max-width: 900px) {
+  .insp { grid-template-columns: minmax(0, 1fr) }
+  .insp-carte { display: none }
+}
+
+.insp-carte { display: flex; flex-direction: column; gap: 9px; min-width: 0 }
+.insp-visuel { position: relative; width: 100%; aspect-ratio: 5 / 7 }
+.insp-visuel img {
+  width: 100%; height: 100%; object-fit: contain; border-radius: 14px;
+  filter: drop-shadow(0 12px 30px rgba(0, 0, 0, .7));
+}
+.insp-sans-image {
+  display: grid; place-items: center; height: 100%;
+  background: rgba(255, 255, 255, .04); border-radius: 14px;
+}
+.insp-badge {
+  position: absolute; right: 12px; top: 12px;
+  display: grid; place-items: center; padding: 5px;
+  background: rgba(12, 9, 16, .86); clip-path: var(--octo-s);
+}
+.insp-ident { display: flex; align-items: center; gap: 9px; flex-wrap: wrap }
+.insp-type { line-height: 1.4 }
+.insp-actuelle { font-size: 10.5px; color: var(--pure-soft); line-height: 1.6 }
+.insp-actuelle b { color: var(--gold-heat) }
+.insp-retirer {
+  display: block; margin-top: 6px; font: inherit; font-size: 9.5px;
+  letter-spacing: .1em; text-transform: uppercase; cursor: pointer;
+  border: none; padding: 5px 10px;
+  background: rgba(200, 30, 45, .2); color: var(--pure-soft);
+}
+.insp-retirer:hover { background: rgba(200, 30, 45, .45); color: var(--pure) }
+
+.insp-panneau { display: flex; flex-direction: column; min-height: 0; min-width: 0 }
+.insp-h {
+  display: flex; align-items: center; gap: 12px; flex: 0 0 auto;
+  padding-bottom: 10px; border-bottom: 1px solid rgba(255, 255, 255, .1);
+}
+.insp-x {
+  margin-left: auto; font: inherit; font-size: 20px; line-height: 1;
+  background: none; border: none; cursor: pointer; color: var(--pure-faint);
+  padding: 0 4px;
+}
+.insp-x:hover { color: var(--pure) }
+.insp-compte { padding: 9px 0 }
+.insp-attente, .insp-err { padding: 20px 2px; line-height: 1.6 }
+.insp-err { color: #FFB3B8 }
+
+.insp-grille {
+  flex: 1 1 auto; min-height: 0; overflow-y: auto; padding-right: 6px;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(122px, 1fr)); gap: 10px;
+  align-content: start;
+}
+.insp-imp {
+  position: relative; display: grid; gap: 3px; padding: 7px;
+  font: inherit; text-align: left; cursor: pointer; border: none;
+  background: rgba(255, 255, 255, .04);
+  clip-path: var(--octo-s);
+  transition: background .2s ease, transform .2s ease;
+}
+.insp-imp:hover { background: rgba(232, 89, 12, .22); transform: translateY(-3px) }
+.insp-imp.on { background: linear-gradient(150deg, rgba(232, 89, 12, .42), rgba(139, 69, 199, .3)) }
+.insp-imp img { width: 100%; border-radius: 7px; display: block }
+.insp-imp-vide {
+  display: grid; place-items: center; aspect-ratio: 5 / 7;
+  background: rgba(255, 255, 255, .05); color: var(--pure-faint); border-radius: 7px;
+}
+.insp-imp-set { font-size: 9.5px; letter-spacing: .1em; color: var(--pure); font-weight: 700 }
+.insp-imp-prix { font-size: 10px; color: var(--gold-heat) }
+.insp-imp-tags { font-size: 8.5px; color: var(--pure-faint); line-height: 1.35 }
+.insp-imp-badge {
+  position: absolute; right: 8px; top: 8px;
+  display: grid; place-items: center; padding: 3px;
+  background: rgba(12, 9, 16, .86); border-radius: 4px;
+}
+
+/* ============================================================
+   ARTS ECONOMIQUES — module de Construction
+   ============================================================ */
+.va-tete { display: flex; align-items: center; gap: 10px; flex-wrap: wrap }
+.va-nom { font-size: 12.5px; font-weight: 700; color: var(--pure) }
+.va-actuel { margin-left: auto }
+.va-passer {
+  flex: 0 0 auto; font: inherit; font-size: 9px; letter-spacing: .14em;
+  text-transform: uppercase; font-weight: 700; padding: 5px 12px;
+  border: none; cursor: pointer; clip-path: var(--octo-s);
+  background: rgba(255, 255, 255, .07); color: var(--pure-soft);
+}
+.va-passer:hover { background: rgba(255, 255, 255, .14); color: var(--pure) }
+.va-passer:disabled { opacity: .4; cursor: default }
+.va-grille {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 8px;
+}
+.va-carte {
+  display: grid; gap: 2px; padding: 6px; font: inherit; text-align: left;
+  cursor: pointer; border: none; background: rgba(255, 255, 255, .04);
+  clip-path: var(--octo-s);
+  transition: background .2s ease, transform .2s ease;
+}
+.va-carte:hover { background: rgba(232, 89, 12, .26); transform: translateY(-3px) }
+.va-carte img { width: 100%; border-radius: 6px; display: block }
+.va-set { font-size: 9px; letter-spacing: .1em; color: var(--pure); font-weight: 700 }
+.va-prix { font-size: 9.5px; color: var(--gold-heat) }
+.va-reste { display: flex; align-items: center; gap: 6px; line-height: 1.5 }

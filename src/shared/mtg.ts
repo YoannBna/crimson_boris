@@ -208,6 +208,25 @@ export interface Printing {
   styleScore: number
 }
 
+/**
+ * Illustration retenue par l'operateur pour une carte.
+ *
+ * Elle prime sur l'impression de l'export partout ou la carte s'affiche,
+ * et se retrouve dans l'export produit par la Forge — sans quoi le choix
+ * ne vivrait qu'a l'ecran.
+ */
+export interface ChosenArt {
+  cardName: string
+  scryfallId: string
+  setCode: string
+  setName: string
+  collectorNumber: string
+  artist: string | null
+  imageNormal: string | null
+  priceEur: number | null
+  chosenAt: string
+}
+
 /** Impressions alternatives proposees pour une carte deja possedee. */
 export interface StyleFind {
   cardName: string

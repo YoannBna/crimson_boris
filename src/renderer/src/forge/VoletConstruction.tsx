@@ -1,10 +1,25 @@
 import { useEffect, useRef, useState } from 'react'
-import type { ResolvedDeck, SimResult, Suggestion } from '@shared/mtg'
+import type {
+  ChosenArt,
+  Printing,
+  ResolvedDeck,
+  SimResult,
+  StyleFind,
+  Suggestion
+} from '@shared/mtg'
 import type { Advice, Change, DirectivePlan, PoolResult, Workbench } from '@shared/forge'
 import { Mana } from './Mana'
 import { Attente, Bloc } from './VoletAnalyse'
+import { VoletArts } from './VoletArts'
 
-type Source = 'auto' | 'recherche' | 'directives'
+type Source = 'auto' | 'recherche' | 'directives' | 'arts'
+
+const LIBELLE: Record<Source, string> = {
+  auto: 'Propositions',
+  recherche: 'Recherche',
+  directives: 'Directives',
+  arts: 'Arts'
+}
 
 /* ============================================================
    Volet CONSTRUCTION — deux entrees, une sortie
@@ -24,6 +39,8 @@ export function VoletConstruction({
   run,
   advice,
   suggestions,
+  styles,
+  arts,
   pool,
   plan,
   bench,
@@ -31,18 +48,23 @@ export function VoletConstruction({
   exported,
   applied,
   onSuggestions,
+  onStyles,
+  onChoisirArt,
   onSearch,
   onPlan,
   onCommit,
   onDrop,
   onClear,
   onExport,
-  onApply
+  onApply,
+  sourceInitiale
 }: {
   deck: ResolvedDeck | null
   run: SimResult | null
   advice: Advice[]
   suggestions: Record<string, Suggestion[]>
+  styles: StyleFind[]
+  arts: Record<string, ChosenArt>
   pool: PoolResult | null
   plan: DirectivePlan | null
   bench: Workbench | null
@@ -50,6 +72,8 @@ export function VoletConstruction({
   exported: string | null
   applied: string | null
   onSuggestions: () => void
+  onStyles: () => void
+  onChoisirArt: (cardName: string, p: Printing) => void
   onSearch: (text: string, legalOnly: boolean, maxPrice?: number) => void
   onPlan: (text: string) => void
   onCommit: (list: Omit<Change, 'id'>[]) => void
@@ -57,8 +81,10 @@ export function VoletConstruction({
   onClear: () => void
   onExport: () => void
   onApply: () => void
+  /** Le noeud « Arts » de la constellation ouvre Construction sur ce module */
+  sourceInitiale: Source
 }) {
-  const [source, setSource] = useState<Source>('auto')
+  const [source, setSource] = useState<Source>(sourceInitiale)
   const [texte, setTexte] = useState('')
   const [requete, setRequete] = useState('')
   const [legalOnly, setLegalOnly] = useState(true)
@@ -75,18 +101,23 @@ export function VoletConstruction({
     if (source === 'directives') zone.current?.focus()
   }, [source])
 
+  // Le volet reste monte quand on passe d'une categorie de la
+  // constellation a une autre : sans cette synchronisation, cliquer
+  // « Arts » depuis Construction ne changerait rien a l'ecran.
+  useEffect(() => setSource(sourceInitiale), [sourceInitiale])
+
   if (!deck) return <Attente texte="Charge une liste : la construction travaille sur un deck existant." />
 
   return (
     <div className="vp vc">
       <div className="vc-onglets">
-        {(['auto', 'recherche', 'directives'] as Source[]).map((s) => (
+        {(['auto', 'recherche', 'directives', 'arts'] as Source[]).map((s) => (
           <button
             key={s}
             className={`vc-onglet${source === s ? ' on' : ''}`}
             onClick={() => setSource(s)}
           >
-            {s === 'auto' ? 'Propositions' : s === 'recherche' ? 'Recherche' : 'Directives'}
+            {LIBELLE[s]}
           </button>
         ))}
       </div>
@@ -176,6 +207,16 @@ export function VoletConstruction({
               </>
             )}
           </Bloc>
+        )}
+
+        {source === 'arts' && (
+          <VoletArts
+            styles={styles}
+            arts={arts}
+            busy={busy}
+            onCharger={onStyles}
+            onChoisir={onChoisirArt}
+          />
         )}
 
         {source === 'directives' && (

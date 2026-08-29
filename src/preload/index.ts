@@ -7,7 +7,7 @@ import type {
   Settings,
   TaskState
 } from '@shared/types'
-import type { SimConfig } from '@shared/mtg'
+import type { ChosenArt, SimConfig } from '@shared/mtg'
 import type { Change, ForgeAPI, PoolQuery } from '@shared/forge'
 import type { ConfigAPI, ConnectorId, OperatorProfile } from '@shared/config'
 import type { VersionInfo } from '@shared/version'
@@ -26,7 +26,12 @@ const mtg: MtgAPI = {
   getLastRun: () => ipcRenderer.invoke('mtg:last-run'),
   runSim: (config: Partial<SimConfig>) => ipcRenderer.invoke('mtg:run-sim', config),
   getSuggestions: () => ipcRenderer.invoke('mtg:suggestions'),
-  getStyleUpgrades: (names?: string[]) => ipcRenderer.invoke('mtg:style', names)
+  getStyleUpgrades: (names?: string[]) => ipcRenderer.invoke('mtg:style', names),
+
+  getPrintings: (name: string) => ipcRenderer.invoke('mtg:printings', name),
+  getArts: () => ipcRenderer.invoke('mtg:arts'),
+  chooseArt: (art: Omit<ChosenArt, 'chosenAt'>) => ipcRenderer.invoke('mtg:choose-art', art),
+  clearArt: (cardName: string) => ipcRenderer.invoke('mtg:clear-art', cardName)
 }
 
 const forge: ForgeAPI = {

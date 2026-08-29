@@ -76,6 +76,23 @@ export function getDb(): Database.Database {
       payload   TEXT NOT NULL
     );
     CREATE INDEX IF NOT EXISTS idx_sim_runs_at ON sim_runs(run_at DESC);
+
+    -- Illustration choisie pour une carte.
+    --
+    -- Hors du deck volontairement : un deck est un instantane, et
+    -- revenir a une version anterieure ne doit pas defaire un choix
+    -- graphique. L'art suit la carte, pas la liste.
+    CREATE TABLE IF NOT EXISTS card_arts (
+      card_name        TEXT PRIMARY KEY,
+      scryfall_id      TEXT NOT NULL,
+      set_code         TEXT NOT NULL,
+      set_name         TEXT NOT NULL DEFAULT '',
+      collector_number TEXT NOT NULL,
+      artist           TEXT,
+      image_normal     TEXT,
+      price_eur        REAL,
+      chosen_at        TEXT NOT NULL
+    );
   `)
 
   migrate(db)

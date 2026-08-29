@@ -122,6 +122,8 @@ export interface MarketThreshold {
 /* --- API exposee au renderer ------------------------------- */
 
 import type {
+  ChosenArt,
+  Printing,
   ResolvedDeck,
   SimConfig,
   SimResult,
@@ -143,6 +145,14 @@ export interface MtgAPI {
   /** Suggestions par identifiant de constat */
   getSuggestions(): Promise<Record<string, Suggestion[]>>
   getStyleUpgrades(names?: string[]): Promise<StyleFind[]>
+
+  /* --- Illustrations ---------------------------------------- */
+  /** Toutes les impressions d'une carte, de la moins chere a la plus chere */
+  getPrintings(name: string): Promise<Printing[]>
+  /** Arts retenus, indexes par nom de carte */
+  getArts(): Promise<Record<string, ChosenArt>>
+  chooseArt(art: Omit<ChosenArt, 'chosenAt'>): Promise<Record<string, ChosenArt>>
+  clearArt(cardName: string): Promise<Record<string, ChosenArt>>
 }
 
 export interface BorisAPI {

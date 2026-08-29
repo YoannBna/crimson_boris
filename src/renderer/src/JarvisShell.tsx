@@ -8,7 +8,7 @@ import { MODES, findMode, type ModeId } from './nav/map'
 import { useCoreStatus } from './lib/useBoris'
 
 /*
- * Coquille de la refonte — etapes 1 a 3.
+ * Coquille de la refonte — etapes 1 a 4.
  *
  * Trois profondeurs de navigation, et une seule regle : on descend par
  * un clic sur ce qui interesse, on remonte par un clic dans le vide.
@@ -77,7 +77,7 @@ export function JarvisShell({ operateur = '' }: { operateur?: string }) {
   // Le poste de travail de la Forge occupe tout l'espace ; la
   // constellation reduite se replie alors dans le coin haut-gauche,
   // seul angle que ni l'avatar ni les volets ne reclament.
-  const travail = courant?.id === 'forge' && focus !== null && focus !== 'arts'
+  const travail = courant?.id === 'forge' && focus !== null
 
   return (
     <div
@@ -135,11 +135,7 @@ export function JarvisShell({ operateur = '' }: { operateur?: string }) {
             <span className="j-dim">{noeud.role}</span>
           </header>
           <div className="focus-body j-body">
-            <p>
-              {focus === 'arts'
-                ? 'L’inspection des cartes et les variantes graphiques arrivent a l’etape suivante : survol pour tirer une carte de la pile, clic pour l’examiner et choisir une autre illustration.'
-                : 'Ce volet recevra son contenu a l’etape consacree aux modules Opti.'}
-            </p>
+            <p>Ce volet recevra son contenu a l’etape consacree aux modules Opti.</p>
             <p className="j-dim">
               La constellation reste derriere, en repere. Un clic dans le vide y ramene.
             </p>

@@ -6,7 +6,7 @@ import type {
   Settings,
   TriggerSource
 } from '@shared/types'
-import type { SimConfig, StyleFind, Suggestion } from '@shared/mtg'
+import type { ChosenArt, SimConfig, StyleFind, Suggestion } from '@shared/mtg'
 import type { Change, PoolQuery } from '@shared/forge'
 import type { ConnectorId, OperatorProfile } from '@shared/config'
 import { broadcast, createWindow, getWindow, markQuitting, revealWindow } from './window'
@@ -867,6 +867,28 @@ function registerMtgIpc(): void {
     const data = await styleUpgrades(targets, { maxPriceEur: 6 })
     styleCache = { key, data }
     return data
+  })
+
+  /* --- Illustrations ------------------------------------------ */
+
+  ipcMain.handle('mtg:printings', async (_e, name: string) => {
+    const { printings } = await import('./providers/scryfall')
+    return printings(name)
+  })
+
+  ipcMain.handle('mtg:arts', async () => {
+    const { allArts } = await import('./store/arts')
+    return allArts()
+  })
+
+  ipcMain.handle('mtg:choose-art', async (_e, art: Omit<ChosenArt, 'chosenAt'>) => {
+    const { chooseArt } = await import('./store/arts')
+    return chooseArt(art)
+  })
+
+  ipcMain.handle('mtg:clear-art', async (_e, cardName: string) => {
+    const { clearArt } = await import('./store/arts')
+    return clearArt(cardName)
   })
 }
 

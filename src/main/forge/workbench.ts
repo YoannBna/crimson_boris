@@ -11,6 +11,7 @@ import type {
 } from '@shared/forge'
 import type { ResolvedDeck } from '@shared/mtg'
 import { search } from '../providers/scryfall'
+import { allArts } from '../store/arts'
 import { deckById, deckVersions, saveDeckReturningId } from '../store/decks'
 import { putCards } from '../store/cards'
 import { parseDirectives } from './directives'
@@ -204,9 +205,19 @@ export async function exportPlan(
   }
 
   const commanders = new Set(deck.commander.map((c) => c.name))
-  const lines = [...counts.entries()].map(([name, n]) =>
-    commanders.has(name) ? `${n}x ${name} [Commander{top}]` : `${n}x ${name}`
-  )
+  /*
+   * L'illustration retenue passe dans l'export, sous la forme
+   * « (SET) numero » que les trois formats comprennent. Sans elle, le
+   * choix ne vivrait qu'a l'ecran de Boris et se perdrait des la
+   * premiere reimportation.
+   */
+  const arts = allArts()
+  const lines = [...counts.entries()].map(([name, n]) => {
+    const art = arts[name]
+    const impression = art ? ` (${art.setCode}) ${art.collectorNumber}` : ''
+    const tag = commanders.has(name) ? ' [Commander{top}]' : ''
+    return `${n}x ${name}${impression}${tag}`
+  })
 
   const stamp = new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-')
   const path = join(dir, `${deck.name}-forge-${stamp}.txt`)
