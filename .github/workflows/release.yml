@@ -53,7 +53,11 @@ jobs:
 
           git add package.json package-lock.json
           git commit -m "Version $VERSION [skip ci]"
-          git tag "v$VERSION"
+          # Tag ANNOTE, et non leger : `--follow-tags` ne pousse que les
+          # tags annotes. Avec un tag leger, le commit partait seul, le
+          # tag restait sur le runner, et les deux jobs de compilation
+          # echouaient a la caisse sur un `ref:` introuvable.
+          git tag -a "v$VERSION" -m "Version $VERSION"
           git push origin main --follow-tags
 
   # --- 2 · Compile et publie, une plateforme par machine -----
