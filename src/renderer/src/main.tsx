@@ -5,6 +5,7 @@ import { JarvisShell } from './JarvisShell'
 import './styles/base.css'
 import './styles/modules.css'
 import './styles/jarvis.css'
+import './styles/forge.css'
 
 /*
  * Refonte en cours : la nouvelle coquille se monte a la place de

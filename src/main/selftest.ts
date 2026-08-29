@@ -26,6 +26,9 @@ let passed = 0
 let failed = 0
 const failures: string[] = []
 
+/** Derniere version de deck existant avant les epreuves qui en ecrivent. */
+let repereDecks = -1
+
 function assert(cond: unknown, message: string): void {
   if (!cond) throw new Error(message)
 }
@@ -105,6 +108,22 @@ async function buildCases(): Promise<Case[]> {
     eq(r.counts.maybeboard, 1, 'maybeboard')
     eq(r.counts.sideboard, 1, 'sideboard')
     eq(r.counts.excluded, 2, 'exclues (noDeck + pas terrible)')
+  })
+
+  /*
+   * Les categories de l'export sont ce qui range le deck a l'ecran. Sans
+   * ce tri, « Commander », « noDeck » ou « foil » remonteraient comme
+   * des rayons de rangement a cote de « Vampires ».
+   */
+  add('Parseur d’exports', 'separe les categories des etiquettes de structure', async () => {
+    const { categoriesOf } = await import('./deck/resolve')
+    // Ordre reel d'un export Archidekt : finition avant les crochets.
+    const r = parseDeck('1x Gatekeeper of Malakir (f10) 11 *F* [Commander{top}{noPrice},Vampires]')
+    const tags = r.lines[0].tags
+    assert(tags.includes('Vampires'), `categorie lue — obtenu ${tags.join('|')}`)
+    assert(tags.includes('top') && tags.includes('foil'), `drapeaux lus — ${tags.join('|')}`)
+    const cats = categoriesOf(tags)
+    eq(cats.join('|'), 'Vampires', 'seule la categorie survit au tri')
   })
 
   add('Parseur d’exports', 'rejette sans avaler en silence', () => {
@@ -363,7 +382,11 @@ async function buildCases(): Promise<Case[]> {
 
   add('Forge — etabli', 'appliquer un plan modifie reellement le deck', async () => {
     const wb = await import('./forge/workbench')
-    const { latestDeck, saveDeck } = await import('./store/decks')
+    const { latestDeck, saveDeck, lastDeckId } = await import('./store/decks')
+
+    // Repere pose avant la premiere ecriture : la derniere epreuve du
+    // groupe rendra la pile a cet etat.
+    if (repereDecks < 0) repereDecks = lastDeckId()
 
     const deck = fauxDeck(10)
     saveDeck(deck)
@@ -411,6 +434,24 @@ async function buildCases(): Promise<Case[]> {
       eq(latestDeck()?.main.length, cible.cards, 'version rechargee')
       assert(wb.history().length > pile.length, 'rien n’est efface : la pile grandit')
     }
+  })
+
+  /*
+   * Les epreuves tournent sur la vraie base. Sans cette derniere marche,
+   * un deck d'essai de dix cartes restait en tete de pile et remplacait
+   * la liste de l'operateur a l'ecran — constate, pas suppose.
+   */
+  add('Forge — etabli', 'les epreuves rendent la pile intacte', async () => {
+    const { dropDeckVersionsAfter, lastDeckId, deckVersions } = await import('./store/decks')
+    assert(repereDecks >= 0, 'un repere a bien ete pose')
+    assert(deckVersions()[0]?.name === 'epreuve', 'la tete de pile est bien un deck d’essai')
+    dropDeckVersionsAfter(repereDecks)
+    eq(lastDeckId(), repereDecks, 'la pile revient a son repere')
+    assert(
+      !deckVersions().some((v) => v.id > repereDecks),
+      'aucune version d’essai ne subsiste'
+    )
+    repereDecks = -1
   })
 
   /* ---------- Simulation ---------- */
@@ -479,6 +520,25 @@ async function buildCases(): Promise<Case[]> {
       assert(card.roles.includes('ramp'), 'classee comme rampe')
       const p = await printings('Sol Ring')
       assert(p.length > 3, 'plusieurs impressions')
+    },
+    true
+  )
+
+  add(
+    'Reseau',
+    'les categories de l’export survivent a la resolution',
+    async () => {
+      const { resolveDeck } = await import('./deck/resolve')
+      const parsed = parseDeck(
+        ['1x Edgar Markov (VOW) 234 [Commander{top}]', '1x Sol Ring (C17) 221 [Rampe]'].join('\n')
+      )
+      const deck = await resolveDeck(parsed, { name: 'epreuve', sourceFile: null })
+      // Indexees sur le nom resolu : c'est celui que l'interface affiche.
+      eq(deck.categories?.['Sol Ring']?.[0], 'Rampe', 'categorie de la carte du deck')
+      assert(
+        deck.categories?.['Edgar Markov'] === undefined,
+        'le commandant ne porte que des etiquettes de structure'
+      )
     },
     true
   )

@@ -1,0 +1,447 @@
+/* ============================================================
+   MODE FORGE
+   Le deck a gauche, les trois volets a droite, la pile en bas.
+   ============================================================ */
+
+.forge-work {
+  position: fixed;
+  /* Haut : l'avatar ancre. Bas : la fleche de retour.
+     Les deux bandes restent libres, le reste est a la Forge. */
+  top: 92px; left: 30px; right: 30px; bottom: 84px;
+  z-index: 20;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(0, 1fr) minmax(340px, 424px);
+  grid-template-rows: minmax(0, 1fr) auto;
+  animation: ouvre-forge .5s cubic-bezier(.22, 1, .36, 1) both;
+}
+@keyframes ouvre-forge {
+  from { opacity: 0; transform: translateY(16px) }
+  to   { opacity: 1; transform: none }
+}
+
+.forge-deck { grid-column: 1; grid-row: 1 }
+.forge-side { grid-column: 2; grid-row: 1 }
+.forge-deck, .forge-side {
+  display: flex; flex-direction: column;
+  min-height: 0; overflow: hidden;
+  padding: 14px 16px;
+  /* base.css donne 22px de marge basse a tout <section> : sans cette
+     remise a zero, les deux volets s'arretent 22px avant le bas de leur
+     rangee et la grille flotte. */
+  margin: 0;
+}
+
+/*
+ * Le poste occupe l'ecran. La constellation reduite se glisse alors
+ * dans le seul creux qui reste : le coin bas-droit, ou la rangee des
+ * versions n'a rien pose. Elle reste donc un repere sans rien masquer.
+ */
+.jarvis.travail .cst-reduced {
+  transform: scale(.2) translate(194%, 171%);
+  opacity: .55;
+}
+
+/* Ecran etroit : les volets passent sous le deck plutot que de
+   comprimer les deux colonnes jusqu'a l'illisible. */
+@media (max-width: 1180px) {
+  .forge-work {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(200px, 1fr) minmax(240px, 1fr) auto;
+  }
+  .forge-deck { grid-column: 1; grid-row: 1 }
+  .forge-side { grid-column: 1; grid-row: 2 }
+  .pile { grid-row: 3 }
+}
+
+/* ============================================================
+   COLONNE DU DECK
+   ============================================================ */
+.forge-vide { display: grid; gap: 14px; place-content: center; text-align: center; height: 100% }
+.forge-vide .oct-btn { justify-self: center }
+
+.fd-head { flex: 0 0 auto; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,.09) }
+.fd-titre { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap }
+.fd-total {
+  font-size: 11px; letter-spacing: .12em; font-weight: 700;
+  padding: 3px 9px; clip-path: var(--octo-s);
+}
+.fd-total.ok { background: rgba(59, 138, 86, .3); color: #9FE0B8 }
+.fd-total.hs { background: rgba(200, 30, 45, .28); color: #FFB3B8 }
+
+.fd-chiffres { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin-top: 10px }
+.fd-chiffre { display: flex; flex-direction: column; line-height: 1.25 }
+.fd-chiffre b { font-size: 15px; color: var(--pure); font-weight: 700 }
+.fd-chiffre i {
+  font-style: normal; font-size: 9px; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--pure-faint);
+}
+.fd-identite { display: flex; gap: 3px; margin-left: auto }
+
+/* Courbe de mana */
+.fd-courbe { display: flex; align-items: flex-end; gap: 4px; height: 54px; margin-top: 12px }
+.fd-bar {
+  position: relative; flex: 1; height: 100%;
+  display: flex; align-items: flex-end; justify-content: center;
+  background: rgba(255, 255, 255, .04);
+}
+.fd-bar-fill {
+  width: 100%;
+  background: linear-gradient(180deg, var(--ember-lit), var(--burnt));
+  min-height: 2px;
+  transition: height .5s cubic-bezier(.22, 1, .36, 1);
+}
+.fd-bar-n {
+  position: absolute; top: -1px; left: 0; right: 0; text-align: center;
+  font-size: 9px; color: var(--pure-soft);
+}
+.fd-bar-l {
+  position: absolute; bottom: -13px; left: 0; right: 0; text-align: center;
+  font-size: 8.5px; color: var(--pure-faint);
+}
+.fd-source { margin-top: 20px }
+
+/* Liste */
+.fd-liste { flex: 1 1 auto; min-height: 0; overflow-y: auto; margin-top: 12px; padding-right: 6px }
+.fd-groupe { margin-bottom: 8px }
+.fd-groupe-h {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  background: none; border: none; cursor: pointer; padding: 5px 4px;
+  font: inherit; color: var(--pure);
+  border-bottom: 1px solid rgba(255, 255, 255, .07);
+}
+.fd-groupe-h:hover { background: rgba(255, 255, 255, .04) }
+.fd-chevron { font-size: 9px; color: var(--pure-faint); width: 10px }
+.fd-groupe-n {
+  font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; font-weight: 700;
+}
+.fd-groupe-c {
+  margin-left: auto; font-size: 10px; color: var(--gold-heat); font-weight: 700;
+}
+
+/* Deux colonnes de cartes : une liste de cent lignes sur une colonne
+   demande de faire defiler pour rien. */
+.fd-cartes { columns: 2; column-gap: 18px; padding: 6px 0 2px }
+@media (max-width: 1180px) { .fd-cartes { columns: 3 } }
+
+.fd-carte {
+  display: flex; align-items: center; gap: 7px;
+  break-inside: avoid; padding: 2px 3px; font-size: 11.5px;
+  color: var(--pure-soft);
+}
+.fd-carte:hover { background: rgba(255, 255, 255, .05); color: var(--pure) }
+.fd-n { width: 16px; font-size: 9.5px; color: var(--gold-heat); flex: 0 0 auto }
+.fd-nom { flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.fd-prix { flex: 0 0 auto; font-size: 9.5px; color: var(--pure-faint); min-width: 30px; text-align: right }
+
+.fd-nonresolu {
+  margin-top: 10px; padding: 8px 10px; font-size: 10.5px;
+  color: #FFB3B8; background: rgba(200, 30, 45, .12);
+  clip-path: var(--octo-s);
+}
+
+/* ============================================================
+   PASTILLES DE MANA
+   ============================================================ */
+.mana { display: inline-flex; gap: 2px; flex: 0 0 auto }
+.msym {
+  display: inline-grid; place-items: center;
+  width: 13px; height: 13px; border-radius: 50%;
+  font-size: 8px; font-weight: 700; line-height: 1;
+  color: #fff;
+}
+.m-w { background: #E8DFC0; color: #23201A }
+.m-u { background: #2E6FB7 }
+.m-b { background: #322F3A }
+.m-r { background: #B8332A }
+.m-g { background: #35784B }
+.m-c, .m-n { background: #57525F }
+
+/* ============================================================
+   VOLET LATERAL
+   ============================================================ */
+.fs-onglets { display: flex; gap: 6px; flex: 0 0 auto; padding-bottom: 10px }
+.fs-onglet {
+  flex: 1; font: inherit; font-size: 9.5px; letter-spacing: .16em;
+  text-transform: uppercase; font-weight: 700;
+  padding: 8px 4px; cursor: pointer; border: none;
+  clip-path: var(--octo-s);
+  background: rgba(255, 255, 255, .05); color: var(--pure-faint);
+  transition: background .2s ease, color .2s ease;
+}
+.fs-onglet:hover { background: rgba(255, 255, 255, .1); color: var(--pure-soft) }
+.fs-onglet.on {
+  background: linear-gradient(135deg, rgba(139, 69, 199, .55), rgba(232, 89, 12, .45));
+  color: var(--pure);
+}
+/*
+ * Le corps ne defile pas lui-meme : chaque volet gere son propre
+ * debordement. C'est ce qui permet a l'etabli de rester ancre en bas
+ * de Construction — colle au bas d'un conteneur qui defilait, il
+ * partait sous la ligne de flottaison des que les propositions
+ * s'allongeaient.
+ */
+.fs-corps { flex: 1 1 auto; min-height: 0; overflow: hidden; display: flex; flex-direction: column }
+.fs-erreur {
+  flex: 0 0 auto; margin-bottom: 8px; padding: 8px 10px; font-size: 11px;
+  color: #FFB3B8; background: rgba(200, 30, 45, .16); clip-path: var(--octo-s);
+}
+
+.vp {
+  display: grid; gap: 14px; align-content: start;
+  flex: 1 1 auto; min-height: 0; overflow-y: auto; padding-right: 6px;
+}
+.vp-attente { padding: 20px 4px }
+.vp-bloc { display: grid; gap: 8px }
+.vp-bloc-t {
+  margin: 0; font-size: 9.5px; letter-spacing: .2em; text-transform: uppercase;
+  font-weight: 700; color: var(--pure-faint);
+  padding-bottom: 5px; border-bottom: 1px solid rgba(255, 255, 255, .08);
+}
+.vpb-ok .vp-bloc-t { color: #8FD6AC }
+.vp-note { line-height: 1.55 }
+
+.vp-item {
+  padding: 8px 10px; font-size: 11.5px;
+  border-left: 2px solid var(--pure-ghost);
+  background: rgba(255, 255, 255, .03);
+}
+.vp-t {
+  display: flex; align-items: center; gap: 7px; flex-wrap: wrap;
+  color: var(--pure); font-weight: 700; font-size: 11.5px;
+}
+.vp-g {
+  font-size: 8px; letter-spacing: .14em; text-transform: uppercase;
+  padding: 2px 6px; background: rgba(255, 255, 255, .1); color: var(--pure-soft);
+}
+.vp-m { color: var(--pure-soft); margin-top: 4px; line-height: 1.5 }
+.vp-r { color: var(--pure-faint); margin-top: 3px; line-height: 1.5; font-style: italic }
+.vp-cartes { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px }
+.vp-cartes span {
+  font-size: 9.5px; padding: 2px 6px; background: rgba(255, 255, 255, .06);
+  color: var(--pure-soft);
+}
+.vp-plus { color: var(--pure-faint) }
+
+/* Portees a `.vp-item` : `g-crit` et ses voisines servent deja a
+   l'ancienne interface, qui ne doit rien recevoir d'ici. */
+.vp-item.vp-ok, .vp-item.vs-nominal { border-left-color: #3B8A56 }
+.vp-item.g-crit, .vp-item.vs-critique { border-left-color: var(--blood-2) }
+.vp-item.g-hot, .vp-item.vs-desequilibre { border-left-color: var(--ember-2) }
+.vp-item.g-warm, .vp-item.vs-tension { border-left-color: var(--gold-heat) }
+
+/* ============================================================
+   SIMULATION
+   ============================================================ */
+.vs-form { display: grid; gap: 8px }
+.vs-form label { display: flex; align-items: center; gap: 10px; font-size: 11px }
+.vs-form label > span { flex: 0 0 74px; color: var(--pure-faint); letter-spacing: .08em }
+.vs-form select, .vs-form input {
+  flex: 1; font: inherit; font-size: 11px; padding: 6px 9px;
+  background: rgba(255, 255, 255, .06); color: var(--pure);
+  border: 1px solid rgba(255, 255, 255, .12);
+}
+.vs-meta { line-height: 1.6 }
+.vs-grille { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px }
+.vs-mesure {
+  display: flex; flex-direction: column; gap: 2px;
+  padding: 8px 10px; background: rgba(255, 255, 255, .04);
+  clip-path: var(--octo-s);
+}
+.vs-mesure b { font-size: 16px; color: var(--pure); font-weight: 700; line-height: 1.1 }
+.vs-mesure i {
+  font-style: normal; font-size: 9px; letter-spacing: .06em; color: var(--pure-faint);
+}
+
+.vs-courbe { display: flex; align-items: flex-end; gap: 3px; height: 60px; margin-bottom: 16px }
+.vs-bar {
+  position: relative; flex: 1; height: 100%;
+  display: flex; align-items: flex-end; background: rgba(255, 255, 255, .04);
+}
+.vs-bar-fill {
+  width: 100%; min-height: 2px;
+  background: linear-gradient(180deg, var(--violet), var(--mauve));
+}
+.vs-bar-n {
+  position: absolute; top: -12px; left: 0; right: 0; text-align: center;
+  font-size: 8px; color: var(--pure-soft);
+}
+.vs-bar-l {
+  position: absolute; bottom: -12px; left: 0; right: 0; text-align: center;
+  font-size: 8px; color: var(--pure-faint);
+}
+
+/* ============================================================
+   CONSTRUCTION
+   ============================================================ */
+.vc { display: flex; flex-direction: column; gap: 12px; overflow: hidden; padding-right: 0 }
+.vc-onglets { display: flex; gap: 4px; flex: 0 0 auto }
+.vc-onglet {
+  flex: 1; font: inherit; font-size: 9px; letter-spacing: .12em;
+  text-transform: uppercase; font-weight: 700; padding: 6px 4px;
+  border: none; cursor: pointer; color: var(--pure-faint);
+  background: rgba(255, 255, 255, .04);
+}
+.vc-onglet:hover { color: var(--pure-soft) }
+.vc-onglet.on { background: rgba(232, 89, 12, .32); color: var(--pure) }
+.vc-source {
+  display: grid; gap: 14px; align-content: start;
+  flex: 1 1 auto; min-height: 0; overflow-y: auto; padding-right: 6px;
+}
+
+.vc-form { display: grid; gap: 8px }
+.vc-form input {
+  font: inherit; font-size: 11px; padding: 7px 10px; width: 100%;
+  background: rgba(255, 255, 255, .06); color: var(--pure);
+  border: 1px solid rgba(255, 255, 255, .12);
+}
+.vc-form-l { display: flex; gap: 14px; align-items: center; flex-wrap: wrap }
+.vc-check { display: flex; align-items: center; gap: 6px; font-size: 10.5px; color: var(--pure-faint) }
+.vc-prix { width: 66px }
+.vc-scry { line-height: 1.6; word-break: break-all }
+.vc-scry code { color: var(--gold-heat) }
+
+.vc-zone {
+  font: inherit; font-size: 11.5px; line-height: 1.6; padding: 9px 11px; width: 100%;
+  background: rgba(255, 255, 255, .06); color: var(--pure);
+  border: 1px solid rgba(255, 255, 255, .12); resize: vertical;
+}
+.vc-plan { display: grid; gap: 5px; margin-top: 4px }
+.vc-rapport { font-size: 11px; color: var(--pure-soft); line-height: 1.5 }
+.vc-rejet { font-size: 11px; color: #FFB3B8; line-height: 1.5 }
+
+.vc-mini {
+  margin-left: auto; font: inherit; font-size: 10px; font-weight: 700;
+  padding: 2px 9px; cursor: pointer; border: none;
+  background: rgba(232, 89, 12, .3); color: var(--pure);
+}
+.vc-mini:hover { background: rgba(232, 89, 12, .55) }
+.vc-noms { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 7px }
+.vc-nom {
+  font: inherit; font-size: 9.5px; padding: 3px 7px; cursor: pointer; border: none;
+  background: rgba(200, 30, 45, .18); color: var(--pure-soft);
+}
+.vc-nom:hover { background: rgba(200, 30, 45, .45); color: var(--pure) }
+
+.vc-lot { display: grid; gap: 4px }
+.vc-lot-t {
+  font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--gold-heat); margin-top: 6px;
+}
+.vc-prop {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 7px; background: rgba(255, 255, 255, .035);
+}
+.vc-prop:hover { background: rgba(255, 255, 255, .07) }
+.vc-plus {
+  flex: 0 0 auto; width: 20px; height: 20px; font: inherit; font-size: 13px;
+  line-height: 1; cursor: pointer; border: none;
+  background: rgba(59, 138, 86, .3); color: var(--pure);
+}
+.vc-plus:hover { background: rgba(59, 138, 86, .65) }
+.vc-prop-b { flex: 1 1 auto; min-width: 0 }
+.vc-prop-n {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11.5px; color: var(--pure); font-weight: 700;
+}
+.vc-prop-w {
+  font-size: 10px; color: var(--pure-faint); line-height: 1.4;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.vc-note { font-size: 9px; color: var(--gold-heat); font-weight: 700 }
+.vc-prop-p { flex: 0 0 auto; font-size: 10px; color: var(--pure-soft) }
+
+/* --- Etabli, ancre en bas du volet ------------------------- */
+.vc-etabli {
+  flex: 0 0 auto;
+  padding: 10px 12px;
+  background: rgba(12, 9, 16, .82);
+  border-top: 1px solid rgba(232, 89, 12, .45);
+  display: grid; gap: 8px;
+}
+.vce-h { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; font-size: 10.5px }
+.vce-t {
+  font-size: 9.5px; letter-spacing: .22em; text-transform: uppercase;
+  font-weight: 700; color: var(--gold-heat);
+}
+.vce-total { color: var(--pure-soft) }
+.vce-total .ok { color: #9FE0B8 }
+.vce-total .hs { color: #FFB3B8 }
+.vce-flux .up { color: #9FE0B8 }
+.vce-flux .dn { color: #FFB3B8 }
+.vce-eur { margin-left: auto; color: var(--pure-faint); font-size: 10px }
+.vce-vide { line-height: 1.55 }
+
+.vce-liste { max-height: 148px; overflow-y: auto; display: grid; gap: 2px }
+.vce-row {
+  display: flex; align-items: center; gap: 7px;
+  padding: 3px 6px; font-size: 11px; background: rgba(255, 255, 255, .04);
+}
+.r-add { border-left: 2px solid #3B8A56 }
+.r-cut { border-left: 2px solid var(--blood-2) }
+.vce-signe { flex: 0 0 auto; font-weight: 700; color: var(--pure) }
+.vce-n { flex: 0 0 auto; color: var(--pure); max-width: 44%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.vce-w {
+  flex: 1 1 auto; min-width: 0; font-size: 9.5px; color: var(--pure-faint);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.vce-x {
+  flex: 0 0 auto; font: inherit; font-size: 13px; line-height: 1; cursor: pointer;
+  border: none; background: none; color: var(--pure-faint); padding: 0 4px;
+}
+.vce-x:hover { color: var(--blood-2) }
+
+.vce-verdict { font-size: 10.5px; color: #FFB3B8; line-height: 1.5 }
+.vce-verdict.ok { color: #9FE0B8 }
+.vce-actions { display: flex; gap: 6px }
+.vce-actions .oct-btn { flex: 1; justify-content: center; padding: 8px 6px; font-size: 9px }
+.vce-ok { font-size: 10.5px; color: #9FE0B8; line-height: 1.5 }
+
+/* ============================================================
+   PILE DES VERSIONS
+   ============================================================ */
+.pile {
+  grid-column: 1 / -1;
+  display: flex; align-items: center; gap: 12px;
+  padding: 8px 4px;
+}
+.pile-t { display: flex; align-items: baseline; gap: 6px; flex: 0 0 auto; text-transform: uppercase }
+.pile-t b { color: var(--gold-heat); font-size: 12px }
+.pile-liste { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; flex: 1 1 auto }
+.pile-v {
+  flex: 0 0 auto; display: grid; gap: 1px; text-align: left;
+  font: inherit; cursor: pointer; border: none; padding: 6px 11px;
+  clip-path: var(--octo-s);
+  background: rgba(255, 255, 255, .05);
+  transition: background .2s ease, transform .2s ease;
+}
+.pile-v:hover:not(:disabled) { background: rgba(232, 89, 12, .28); transform: translateY(-2px) }
+.pile-v:disabled { cursor: default }
+.pile-v.on { background: linear-gradient(135deg, rgba(232, 89, 12, .45), rgba(139, 69, 199, .4)) }
+.pile-rang {
+  font-size: 8px; letter-spacing: .14em; text-transform: uppercase; color: var(--pure-faint);
+}
+.pile-v.on .pile-rang { color: var(--gold-heat) }
+.pile-n { font-size: 11px; color: var(--pure); font-weight: 700 }
+.pile-d { font-size: 8.5px; color: var(--pure-faint) }
+
+/* ============================================================
+   DEFILEMENT
+   Une barre visible casserait la continuite du fond ; une barre
+   invisible fait perdre le reperage. Un filet suffit.
+   ============================================================ */
+.fd-liste::-webkit-scrollbar,
+.vp::-webkit-scrollbar,
+.vc-source::-webkit-scrollbar,
+.vce-liste::-webkit-scrollbar,
+.pile-liste::-webkit-scrollbar { width: 5px; height: 5px }
+.fd-liste::-webkit-scrollbar-thumb,
+.vp::-webkit-scrollbar-thumb,
+.vc-source::-webkit-scrollbar-thumb,
+.vce-liste::-webkit-scrollbar-thumb,
+.pile-liste::-webkit-scrollbar-thumb { background: rgba(232, 89, 12, .35) }
+.fd-liste::-webkit-scrollbar-track,
+.vp::-webkit-scrollbar-track,
+.vc-source::-webkit-scrollbar-track,
+.vce-liste::-webkit-scrollbar-track,
+.pile-liste::-webkit-scrollbar-track { background: rgba(255, 255, 255, .03) }

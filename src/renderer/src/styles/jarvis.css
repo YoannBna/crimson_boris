@@ -321,6 +321,10 @@
 .cst-reduced {
   transform: scale(.3) translate(78%, 62%);
   opacity: .42;
+  /* Repere, pas commande : elle est deja `aria-hidden` et hors du
+     parcours clavier. La laisser cliquable lui ferait voler les clics
+     du volet ouvert par-dessus lequel elle passe. */
+  pointer-events: none;
 }
 .cst-reduced .cst-link { stroke-width: .5 }
 

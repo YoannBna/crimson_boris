@@ -2,6 +2,35 @@ import type { Card, ParseResult, ResolvedDeck } from '@shared/mtg'
 import { collection } from '../providers/scryfall'
 import { getCached, keysFor, nameKey, putCards } from '../store/cards'
 
+/*
+ * Etiquettes de structure : elles disent OU va la carte, pas CE QU'ELLE
+ * EST. Sans ce tri, « Commander », « noDeck » ou « foil » remonteraient
+ * comme des categories de rangement a cote de « Vampires » et « Rampe ».
+ */
+const STRUCTURAL = new Set([
+  'commander',
+  'commandant',
+  'nodeck',
+  'noprice',
+  'top',
+  'foil',
+  'maybeboard',
+  'maybe',
+  'sideboard',
+  'side',
+  'excluded'
+])
+
+export function categoriesOf(tags: string[]): string[] {
+  const out: string[] = []
+  for (const t of tags) {
+    const clean = t.trim()
+    if (clean === '' || STRUCTURAL.has(clean.toLowerCase())) continue
+    if (!out.includes(clean)) out.push(clean)
+  }
+  return out
+}
+
 /**
  * Transforme un export analyse en deck resolu.
  *
@@ -35,6 +64,10 @@ export async function resolveDeck(
   const commander: Card[] = []
   const main: Card[] = []
   const reserve: Card[] = []
+  // Indexees sur le nom RESOLU, pas sur celui de l'export : une carte
+  // recto-verso n'y porte pas le meme nom, et l'interface cherche par
+  // le nom qu'elle affiche.
+  const categories: Record<string, string[]> = {}
 
   for (const line of parsed.lines) {
     const card = hits.get(nameKey(line.name))
@@ -47,6 +80,9 @@ export async function resolveDeck(
     const target =
       line.slot === 'commander' ? commander : line.slot === 'deck' ? main : reserve
     for (let i = 0; i < line.quantity; i++) target.push(card)
+
+    const cats = categoriesOf(line.tags)
+    if (cats.length > 0) categories[card.name] = cats
   }
 
   const foils = [
@@ -69,6 +105,7 @@ export async function resolveDeck(
     reserve,
     unresolved,
     foils,
-    colorIdentity: [...identity]
+    colorIdentity: [...identity],
+    categories
   }
 }

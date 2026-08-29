@@ -82,6 +82,15 @@ export interface ResolvedDeck {
   /** Cartes deja possedees en finition speciale (foil, grave...) */
   foils: string[]
   colorIdentity: string[]
+  /**
+   * Categories Archidekt de l'export, par nom de carte resolu.
+   *
+   * Optionnel : les decks importes avant que le parseur ne les conserve
+   * n'en ont pas, et le classement retombe alors sur les roles deduits.
+   * Mieux vaut un repli explicite qu'un champ obligatoire qui ferait
+   * echouer la lecture des anciennes versions.
+   */
+  categories?: Record<string, string[]>
 }
 
 /* --- Simulation -------------------------------------------- */

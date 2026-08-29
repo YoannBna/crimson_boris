@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import type {
   Advice,
   Change,
+  DeckVersion,
   DirectivePlan,
   PoolQuery,
   PoolResult,
@@ -19,6 +20,8 @@ export interface ForgeState {
   exported: string | null
   /** Compte rendu de la derniere application de plan */
   applied: string | null
+  /** Pile des versions du deck, la plus recente en tete */
+  versions: DeckVersion[]
 }
 
 export function useForge(deckKey: string | null) {
@@ -30,18 +33,20 @@ export function useForge(deckKey: string | null) {
     busy: null,
     error: null,
     exported: null,
-    applied: null
+    applied: null,
+    versions: []
   })
 
   // L'atelier se recharge quand le deck change d'identite.
   useEffect(() => {
     if (!hasBridge || !deckKey) return
     void (async () => {
-      const [bench, advice] = await Promise.all([
+      const [bench, advice, versions] = await Promise.all([
         window.boris.forge.getWorkbench(),
-        window.boris.forge.advise()
+        window.boris.forge.advise(),
+        window.boris.forge.history()
       ])
-      setState((s) => ({ ...s, bench, advice }))
+      setState((s) => ({ ...s, bench, advice, versions }))
     })()
   }, [deckKey])
 
@@ -117,10 +122,14 @@ export function useForge(deckKey: string | null) {
     (onDeckChanged?: () => void) =>
       guard('Application au deck…', async () => {
         const res = await window.boris.forge.applyPlan()
-        const bench = await window.boris.forge.getWorkbench()
+        const [bench, versions] = await Promise.all([
+          window.boris.forge.getWorkbench(),
+          window.boris.forge.history()
+        ])
         onDeckChanged?.()
         return {
           bench,
+          versions,
           exported: null,
           plan: null,
           applied:
@@ -148,6 +157,28 @@ export function useForge(deckKey: string | null) {
     [guard]
   )
 
+  /**
+   * Recharge une version du deck.
+   *
+   * La version choisie est recopiee en tete de pile plutot que restauree
+   * en place : rien n'est efface, et l'on peut donc repartir dans les
+   * deux sens. C'est aussi pourquoi l'etabli est vide au passage — un
+   * plan ecrit pour une liste n'a pas de sens sur une autre.
+   */
+  const revertTo = useCallback(
+    (versionId: number, onDeckChanged?: () => void) =>
+      guard('Chargement de la version…', async () => {
+        const versions = await window.boris.forge.revertTo(versionId)
+        const [bench, advice] = await Promise.all([
+          window.boris.forge.getWorkbench(),
+          window.boris.forge.advise()
+        ])
+        onDeckChanged?.()
+        return { versions, bench, advice, plan: null, exported: null, applied: null }
+      }),
+    [guard]
+  )
+
   return {
     state,
     searchPool,
@@ -157,6 +188,7 @@ export function useForge(deckKey: string | null) {
     clear,
     exportPlan,
     applyPlan,
-    refreshAdvice
+    refreshAdvice,
+    revertTo
   }
 }

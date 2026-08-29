@@ -88,3 +88,26 @@ export function saveDeckReturningId(deck: ResolvedDeck): number {
     .run(deck.name, deck.sourceFile, deck.importedAt, JSON.stringify(deck))
   return Number(info.lastInsertRowid)
 }
+
+/**
+ * Identifiant de la derniere version, ou -1 si la pile est vide.
+ * Sert de repere aux epreuves, qui doivent rendre la base telle
+ * qu'elles l'ont trouvee.
+ */
+export function lastDeckId(): number {
+  const row = getDb().prepare('SELECT MAX(id) AS id FROM decks').get() as { id: number | null }
+  return row.id ?? -1
+}
+
+/**
+ * Supprime les versions posterieures a un repere.
+ *
+ * Reserve aux epreuves. Elles s'executent dans l'application reelle,
+ * donc sur la vraie base : sans ce nettoyage, un deck d'essai de dix
+ * cartes reste en tete de pile et remplace la liste de l'operateur a
+ * l'ecran. Le defaut a ete constate, pas suppose.
+ */
+export function dropDeckVersionsAfter(id: number): number {
+  const info = getDb().prepare('DELETE FROM decks WHERE id > ?').run(id)
+  return info.changes
+}

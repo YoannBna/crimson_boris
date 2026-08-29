@@ -3,11 +3,12 @@ import type { TriggerSource } from '@shared/types'
 import { Aura } from './components/Aura'
 import { BorisAvatar } from './components/BorisAvatar'
 import { Constellation } from './nav/Constellation'
+import { ForgeWorkspace } from './forge/ForgeWorkspace'
 import { MODES, findMode, type ModeId } from './nav/map'
 import { useCoreStatus } from './lib/useBoris'
 
 /*
- * Coquille de la refonte — etapes 1 et 2.
+ * Coquille de la refonte — etapes 1 a 3.
  *
  * Trois profondeurs de navigation, et une seule regle : on descend par
  * un clic sur ce qui interesse, on remonte par un clic dans le vide.
@@ -15,6 +16,10 @@ import { useCoreStatus } from './lib/useBoris'
  *   1. choix du mode      — l'avatar au centre, deux voies
  *   2. constellation      — toutes les sous-categories en miniature
  *   3. categorie ouverte  — plein ecran, constellation reduite en fond
+ *
+ * En mode Forge, la troisieme profondeur n'est pas une fiche mais un
+ * poste de travail complet : le deck a gauche, trois volets a droite,
+ * la pile des versions en bas.
  */
 
 function salutation(trigger: TriggerSource | undefined, nom: string): string {
@@ -69,8 +74,16 @@ export function JarvisShell({ operateur = '' }: { operateur?: string }) {
   const courant = mode ? findMode(mode) : null
   const noeud = courant && focus ? courant.nodes.find((n) => n.id === focus) : null
 
+  // Le poste de travail de la Forge occupe tout l'espace ; la
+  // constellation reduite se replie alors dans le coin haut-gauche,
+  // seul angle que ni l'avatar ni les volets ne reclament.
+  const travail = courant?.id === 'forge' && focus !== null && focus !== 'arts'
+
   return (
-    <div className={`jarvis depth-${depth}`} onClick={depth === 'accueil' ? undefined : remonter}>
+    <div
+      className={`jarvis depth-${depth}${travail ? ' travail' : ''}`}
+      onClick={depth === 'accueil' ? undefined : remonter}
+    >
       <Aura />
 
       <div className={`avatar-dock${depth === 'accueil' ? ' centre' : ''}`}>
@@ -113,7 +126,9 @@ export function JarvisShell({ operateur = '' }: { operateur?: string }) {
       )}
 
       {/* --- 3 · Categorie ouverte -------------------------------- */}
-      {noeud && (
+      {courant?.id === 'forge' && <ForgeWorkspace noeud={focus} />}
+
+      {noeud && !travail && (
         <section className="focus-view oct" onClick={(e) => e.stopPropagation()}>
           <header className="focus-head">
             <span className="j-title">{noeud.label}</span>
@@ -121,8 +136,9 @@ export function JarvisShell({ operateur = '' }: { operateur?: string }) {
           </header>
           <div className="focus-body j-body">
             <p>
-              Ce volet recevra son contenu aux etapes suivantes — le mode Forge et l’inspection
-              des cartes d’abord, le detail des modules Opti ensuite.
+              {focus === 'arts'
+                ? 'L’inspection des cartes et les variantes graphiques arrivent a l’etape suivante : survol pour tirer une carte de la pile, clic pour l’examiner et choisir une autre illustration.'
+                : 'Ce volet recevra son contenu a l’etape consacree aux modules Opti.'}
             </p>
             <p className="j-dim">
               La constellation reste derriere, en repere. Un clic dans le vide y ramene.
