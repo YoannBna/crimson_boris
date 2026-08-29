@@ -20,6 +20,18 @@
   to   { opacity: 1; transform: none }
 }
 
+/*
+ * base.css habille tout <header> pour l'ancienne interface : cadre,
+ * degrade sang, filet de trois pixels colle en bas. Les en-tetes de la
+ * refonte s'en affranchissent. La remise a zero vient AVANT leurs
+ * regles propres — a specificite egale, c'est la derniere qui gagne.
+ */
+.fd-head, .opti-head, .insp-h {
+  border: none; background: none; box-shadow: none;
+  padding: 0; margin: 0; overflow: visible;
+}
+.fd-head::after, .opti-head::after, .insp-h::after { content: none }
+
 .forge-deck { grid-column: 1; grid-row: 1 }
 .forge-side { grid-column: 2; grid-row: 1 }
 .forge-deck, .forge-side {
@@ -675,3 +687,113 @@
 .mode-card .forge-logo { margin: 0 auto 2px }
 .fd-titre .forge-logo { margin-right: 2px }
 .forge-vide .forge-logo { justify-self: center }
+
+/* ============================================================
+   MODE OPTI
+   Un volet plein cadre par categorie, meme langage visuel que la
+   Forge : les deux modes ne sont pas deux applications.
+   ============================================================ */
+.opti-work {
+  position: fixed;
+  top: 92px; left: 30px; right: 30px; bottom: 84px;
+  z-index: 20; display: flex; justify-content: center;
+  animation: ouvre-forge .5s cubic-bezier(.22, 1, .36, 1) both;
+}
+.opti-panneau {
+  display: flex; flex-direction: column; min-height: 0; overflow: hidden;
+  width: min(1080px, 100%); padding: 16px 20px; margin: 0;
+}
+.opti-head {
+  flex: 0 0 auto; display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
+  padding-bottom: 12px; margin-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, .1);
+}
+.opti-corps { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column }
+
+/* --- Cotations --------------------------------------------- */
+.cot-grille {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px;
+}
+.cot {
+  display: grid; gap: 2px; padding: 9px 11px;
+  background: rgba(255, 255, 255, .04); clip-path: var(--octo-s);
+}
+.cot-l { font-size: 9.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--pure-faint) }
+.cot-p { font-size: 17px; font-weight: 700; color: var(--pure) }
+.cot-p i { font-style: normal; font-size: 9.5px; color: var(--pure-faint); margin-left: 5px }
+.cot-v { font-size: 11px; color: var(--pure-soft) }
+.cot-v.up, .asy-var.up { color: #7FD3A0 }
+.cot-v.dn, .asy-var.dn { color: #FF8A94 }
+.cot-hs { opacity: .55 }
+.cot-e { font-size: 11px; color: #FFB3B8 }
+
+/* --- Asymetries -------------------------------------------- */
+.asy-liste { display: grid; gap: 4px }
+.asy { background: rgba(255, 255, 255, .035) }
+.asy.on { background: rgba(232, 89, 12, .12) }
+.asy-h {
+  display: grid; align-items: center; gap: 10px; width: 100%;
+  grid-template-columns: 62px minmax(0, 1fr) 108px 92px 68px 14px;
+  padding: 7px 10px; font: inherit; text-align: left;
+  background: none; border: none; cursor: pointer;
+}
+.asy-h:hover { background: rgba(255, 255, 255, .05) }
+.asy-tick { font-size: 11px; font-weight: 700; letter-spacing: .1em; color: var(--gold-heat) }
+.asy-nom { font-size: 12px; color: var(--pure); overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.asy-axe {
+  font-size: 8.5px; letter-spacing: .1em; text-transform: uppercase;
+  padding: 2px 7px; color: var(--pure-soft); background: rgba(139, 69, 199, .28);
+  justify-self: start;
+}
+.asy-cours { font-size: 12px; color: var(--pure); font-weight: 700; text-align: right }
+.asy-cours i { font-style: normal; font-size: 9px; color: var(--pure-faint); margin-left: 4px }
+.asy-var { font-size: 11px; color: var(--pure-soft); text-align: right }
+.asy-chev { font-size: 9px; color: var(--pure-faint); text-align: right }
+
+.asy-corps { display: grid; gap: 6px; padding: 4px 12px 12px 74px }
+.asy-ligne { display: grid; grid-template-columns: 132px minmax(0, 1fr); gap: 12px; font-size: 11.5px }
+.asy-lt {
+  font-size: 9px; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--pure-faint); padding-top: 2px;
+}
+.asy-lv { color: var(--pure-soft); line-height: 1.55 }
+.asy-ligne.risque .asy-lt { color: #FF8A94 }
+@media (max-width: 900px) {
+  .asy-h { grid-template-columns: 56px minmax(0, 1fr) 68px 14px }
+  .asy-axe, .asy-cours { display: none }
+  .asy-corps { padding-left: 12px }
+  .asy-ligne { grid-template-columns: minmax(0, 1fr) }
+}
+
+/* --- Modeles de reponse ------------------------------------ */
+.mod { background: rgba(255, 255, 255, .035); padding: 9px 11px }
+.mod-h { display: flex; align-items: center; gap: 10px; margin-bottom: 6px }
+.mod-l { font-size: 11.5px; font-weight: 700; color: var(--pure) }
+.mod-c {
+  margin-left: auto; font: inherit; font-size: 9px; letter-spacing: .12em;
+  text-transform: uppercase; padding: 3px 10px; cursor: pointer; border: none;
+  background: rgba(139, 69, 199, .3); color: var(--pure-soft);
+}
+.mod-c:hover { background: rgba(139, 69, 199, .6); color: var(--pure) }
+.mod-b {
+  margin: 0; font: inherit; font-size: 11px; line-height: 1.6;
+  color: var(--pure-soft); white-space: pre-wrap; word-break: break-word;
+}
+
+/* --- Taches ------------------------------------------------- */
+.tache {
+  display: flex; align-items: flex-start; gap: 10px; padding: 8px 10px;
+  background: rgba(255, 255, 255, .035); cursor: pointer;
+}
+.tache.faite { opacity: .5 }
+.tache.faite .tache-l { text-decoration: line-through }
+.tache-b { flex: 1 1 auto; display: grid; gap: 2px; min-width: 0 }
+.tache-l { font-size: 11.5px; color: var(--pure); font-weight: 700 }
+.tache-d { font-size: 10.5px; color: var(--pure-faint); line-height: 1.5 }
+.tache-e { flex: 0 0 auto; font-size: 9.5px; color: var(--pure-soft) }
+.due-crit { color: #FF8A94 }
+.due-hot { color: var(--ember-lit) }
+
+.opti-corps .vp::-webkit-scrollbar { width: 5px }
+.opti-corps .vp::-webkit-scrollbar-thumb { background: rgba(139, 69, 199, .4) }
+.opti-corps .vp::-webkit-scrollbar-track { background: rgba(255, 255, 255, .03) }

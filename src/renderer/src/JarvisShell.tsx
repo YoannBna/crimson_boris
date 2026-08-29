@@ -5,11 +5,12 @@ import { BorisAvatar } from './components/BorisAvatar'
 import { Constellation } from './nav/Constellation'
 import { ForgeLogo } from './forge/ForgeLogo'
 import { ForgeWorkspace } from './forge/ForgeWorkspace'
+import { OptiVolet } from './opti/OptiVolet'
 import { MODES, findMode, type ModeId } from './nav/map'
 import { useCoreStatus } from './lib/useBoris'
 
 /*
- * Coquille de la refonte — etapes 1 a 4.
+ * Coquille de la refonte.
  *
  * Trois profondeurs de navigation, et une seule regle : on descend par
  * un clic sur ce qui interesse, on remonte par un clic dans le vide.
@@ -75,10 +76,10 @@ export function JarvisShell({ operateur = '' }: { operateur?: string }) {
   const courant = mode ? findMode(mode) : null
   const noeud = courant && focus ? courant.nodes.find((n) => n.id === focus) : null
 
-  // Le poste de travail de la Forge occupe tout l'espace ; la
-  // constellation reduite se replie alors dans le coin haut-gauche,
-  // seul angle que ni l'avatar ni les volets ne reclament.
-  const travail = courant?.id === 'forge' && focus !== null
+  // Les deux modes ouvrent desormais un volet plein cadre : la
+  // constellation reduite se replie dans le coin bas-droit, seul creux
+  // que ni l'avatar ni les volets ne reclament.
+  const travail = focus !== null
 
   return (
     <div
@@ -132,21 +133,7 @@ export function JarvisShell({ operateur = '' }: { operateur?: string }) {
 
       {/* --- 3 · Categorie ouverte -------------------------------- */}
       {courant?.id === 'forge' && <ForgeWorkspace noeud={focus} />}
-
-      {noeud && !travail && (
-        <section className="focus-view oct" onClick={(e) => e.stopPropagation()}>
-          <header className="focus-head">
-            <span className="j-title">{noeud.label}</span>
-            <span className="j-dim">{noeud.role}</span>
-          </header>
-          <div className="focus-body j-body">
-            <p>Ce volet recevra son contenu a l’etape consacree aux modules Opti.</p>
-            <p className="j-dim">
-              La constellation reste derriere, en repere. Un clic dans le vide y ramene.
-            </p>
-          </div>
-        </section>
-      )}
+      {courant?.id === 'opti' && <OptiVolet noeud={noeud ?? null} />}
 
       {/* --- Retour flottant -------------------------------------- */}
       {depth !== 'accueil' && (
