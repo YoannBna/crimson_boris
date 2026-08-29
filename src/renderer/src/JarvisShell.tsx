@@ -3,6 +3,7 @@ import type { TriggerSource } from '@shared/types'
 import { Aura } from './components/Aura'
 import { BorisAvatar } from './components/BorisAvatar'
 import { Constellation } from './nav/Constellation'
+import { ForgeLogo } from './forge/ForgeLogo'
 import { ForgeWorkspace } from './forge/ForgeWorkspace'
 import { MODES, findMode, type ModeId } from './nav/map'
 import { useCoreStatus } from './lib/useBoris'
@@ -105,6 +106,10 @@ export function JarvisShell({ operateur = '' }: { operateur?: string }) {
               className={`mode-card oct oct-${m.tone}`}
               onClick={() => setMode(m.id)}
             >
+              {/* La Forge porte son enseigne ; Opti n'en a pas besoin,
+                  et lui en inventer une pour la symetrie serait du
+                  remplissage. */}
+              {m.id === 'forge' && <ForgeLogo size={86} />}
               <span className="mode-label">{m.label}</span>
               <span className="mode-tagline">{m.tagline}</span>
               <span className="mode-count">{m.nodes.length} domaines</span>

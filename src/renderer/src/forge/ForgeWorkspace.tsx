@@ -4,6 +4,7 @@ import { useArts } from '@/lib/useArts'
 import { useForge } from '@/lib/useForge'
 import { useMtg } from '@/lib/useMtg'
 import { DeckColonne } from './DeckColonne'
+import { frapperLaForge } from './ForgeLogo'
 import { Inspecteur } from './Inspecteur'
 import { PileVersions } from './PileVersions'
 import { VoletAnalyse } from './VoletAnalyse'
@@ -50,8 +51,10 @@ export function ForgeWorkspace({ noeud }: { noeud: string | null }) {
     if (noeud === 'arts') setVolet('construction')
   }, [noeud])
 
+  // Chaque action accomplie fait tomber le marteau : c'est le seul
+  // accuse de reception qui ne demande pas a etre lu.
   const choisirArt = useCallback(
-    (cardName: string, p: Printing) => void choisir(cardName, p),
+    (cardName: string, p: Printing) => void choisir(cardName, p).then(frapperLaForge),
     [choisir]
   )
 
@@ -141,7 +144,12 @@ export function ForgeWorkspace({ noeud }: { noeud: string | null }) {
               onExport={() => void forge.exportPlan()}
               // Le deck est relu apres coup : c'est ce que « valider »
               // doit produire a l'ecran, et non seulement en base.
-              onApply={() => void forge.applyPlan(() => void reloadDeck())}
+              onApply={() =>
+                void forge.applyPlan(() => {
+                  void reloadDeck()
+                  frapperLaForge()
+                })
+              }
             />
           )}
         </div>
@@ -150,7 +158,12 @@ export function ForgeWorkspace({ noeud }: { noeud: string | null }) {
       <PileVersions
         versions={forge.state.versions}
         busy={busy}
-        onCharger={(id) => void forge.revertTo(id, () => void reloadDeck())}
+        onCharger={(id) =>
+          void forge.revertTo(id, () => {
+            void reloadDeck()
+            frapperLaForge()
+          })
+        }
       />
 
       {inspecte && (

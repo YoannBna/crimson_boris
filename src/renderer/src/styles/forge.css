@@ -61,7 +61,7 @@
 .forge-vide .oct-btn { justify-self: center }
 
 .fd-head { flex: 0 0 auto; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,.09) }
-.fd-titre { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap }
+.fd-titre { display: flex; align-items: center; gap: 12px; flex-wrap: wrap }
 .fd-total {
   font-size: 11px; letter-spacing: .12em; font-weight: 700;
   padding: 3px 9px; clip-path: var(--octo-s);
@@ -616,3 +616,62 @@
 .va-set { font-size: 9px; letter-spacing: .1em; color: var(--pure); font-weight: 700 }
 .va-prix { font-size: 9.5px; color: var(--gold-heat) }
 .va-reste { display: flex; align-items: center; gap: 6px; line-height: 1.5 }
+
+/* ============================================================
+   LOGO DE LA FORGE
+   Trois calques : le feu derriere le metal, les etincelles devant.
+   ============================================================ */
+.forge-logo { position: relative; flex: 0 0 auto; cursor: pointer }
+.fl-feu, .fl-etin, .fl-svg { position: absolute; inset: 0; display: block }
+.fl-feu { z-index: 0 }
+.fl-svg { z-index: 1; width: 100%; height: 100%; overflow: visible }
+.fl-etin { z-index: 2; pointer-events: none }
+
+.fl-arete { stroke: rgba(255, 255, 255, .3); stroke-width: 1; fill: none }
+.fl-manche { stroke: url(#fl-manche); stroke-width: 5.5; fill: none }
+
+/* Runes gravees : opacite pulsante, un rythme par rune. */
+.fl-rune {
+  fill: none; stroke: var(--gold-heat); stroke-linecap: round;
+  /* Trait d'epaisseur constante : mis a l'echelle avec le glyphe, il
+     disparaissait a la taille ou le logo est reellement affiche. */
+  stroke-width: 1.3px; vector-effect: non-scaling-stroke;
+  animation: fl-rune 4.6s ease-in-out infinite;
+}
+@keyframes fl-rune {
+  0%, 100% { opacity: .14 }
+  50%      { opacity: .82 }
+}
+
+/*
+ * Le marteau pivote autour de la table de l'enclume. `transform-box`
+ * est indispensable : sans lui, l'origine se calcule sur la boite du
+ * SVG en pixels et le marteau part en vrille des que la taille change.
+ */
+.fl-marteau {
+  transform-box: view-box; transform-origin: 58px 46px;
+  transform: rotate(-14deg);
+}
+.fl-marteau.frappe { animation: fl-coup .52s cubic-bezier(.3, .9, .4, 1) }
+@keyframes fl-coup {
+  0%   { transform: rotate(-14deg) }
+  20%  { transform: rotate(-34deg) }
+  46%  { transform: rotate(12deg) }
+  64%  { transform: rotate(-3deg) }
+  100% { transform: rotate(-14deg) }
+}
+
+.forge-logo:hover .fl-rune { animation-duration: 2.1s }
+
+@media (prefers-reduced-motion: reduce) {
+  .fl-rune { animation: none; opacity: .5 }
+  .fl-marteau.frappe { animation: none }
+}
+
+/* Emplacements */
+/* Seule la Forge porte une enseigne : les deux cartes s'etirent a la
+   meme hauteur, et le contenu d'Opti se recentre au lieu de s'ecarteler. */
+.mode-card { align-content: center }
+.mode-card .forge-logo { margin: 0 auto 2px }
+.fd-titre .forge-logo { margin-right: 2px }
+.forge-vide .forge-logo { justify-self: center }

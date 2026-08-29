@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import type { Card, ChosenArt, ResolvedDeck } from '@shared/mtg'
+import { ForgeLogo } from './ForgeLogo'
 import { Mana } from './Mana'
 import { Pinceau } from './Pinceau'
 import { ranger, statistiques, type Exemplaire, type Groupe } from './lecture'
@@ -26,6 +27,7 @@ export function DeckColonne({
     return (
       <section className="oct oct-warm forge-deck">
         <div className="forge-vide">
+          <ForgeLogo size={118} />
           <span className="j-title">Aucune liste chargee</span>
           <p className="j-body">
             La Forge lit un export Archidekt, Moxfield ou un .dec. Elle en tire les categories,
@@ -104,6 +106,7 @@ function DeckCharge({
     <section className="oct oct-warm forge-deck">
       <header className="fd-head">
         <div className="fd-titre">
+          <ForgeLogo size={40} />
           <span className="j-title">{deck.name}</span>
           <span className={`fd-total${stats.total === 100 ? ' ok' : ' hs'}`}>
             {stats.total} / 100
