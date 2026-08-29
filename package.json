@@ -1,8 +1,8 @@
 {
   "name": "crimson-boris",
   "productName": "Crimson Boris",
-  "version": "2.1.0",
-  "description": "Noyau analytique et executif \u2014 tableau de bord de bureau local",
+  "version": "2.1.1",
+  "description": "Noyau analytique et executif — tableau de bord de bureau local",
   "author": "Crimson Boris",
   "license": "UNLICENSED",
   "private": true,
