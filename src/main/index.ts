@@ -288,6 +288,25 @@ async function captureForReview(outFile: string): Promise<void> {
   const { writeFileSync } = await import('node:fs')
   const w = createWindow(false)
   w.setBounds({ x: -6000, y: 0, width: 1440, height: 1200 })
+
+  /*
+   * `BORIS_SHOT_SIZE=2200x1300` eprouve la mise en page sur un ecran
+   * plus grand que celui de la machine. Passe par l'emulation du
+   * protocole de debogage et non par `setBounds` : macOS borne une
+   * fenetre a la zone utile de l'ecran, si bien qu'une largeur
+   * superieure etait silencieusement ramenee a celle du bureau — la
+   * verification passait sans rien verifier.
+   */
+  const taille = /^(\d{3,5})x(\d{3,5})$/.exec(process.env['BORIS_SHOT_SIZE'] ?? '')
+  if (taille) {
+    w.webContents.debugger.attach('1.3')
+    await w.webContents.debugger.sendCommand('Emulation.setDeviceMetricsOverride', {
+      width: Number(taille[1]),
+      height: Number(taille[2]),
+      deviceScaleFactor: 1,
+      mobile: false
+    })
+  }
   w.showInactive()
   await new Promise((r) => setTimeout(r, 2500))
   /* Declenche les chargements reseau de la page avant la photo :
@@ -323,6 +342,19 @@ async function captureForReview(outFile: string): Promise<void> {
     await w.webContents.executeJavaScript(`window.scrollBy(0, ${extra})`)
     await new Promise((r) => setTimeout(r, 700))
   }
+  if (taille) {
+    // Sous emulation, `capturePage` rend la taille de la fenetre reelle :
+    // c'est le protocole qui doit produire l'image.
+    const shot = (await w.webContents.debugger.sendCommand('Page.captureScreenshot', {
+      captureBeyondViewport: true
+    })) as { data: string }
+    writeFileSync(outFile, Buffer.from(shot.data, 'base64'))
+    console.log('capture ecrite :', outFile)
+    markQuitting()
+    app.quit()
+    return
+  }
+
   const img = await w.webContents.capturePage()
   writeFileSync(outFile, img.toPNG())
   console.log('capture ecrite :', outFile)

@@ -10,7 +10,7 @@
 > refléter l'état exact du projet, l'arborescence, ce qui est validé, les
 > demandes en cours et les priorités suivantes.
 
-**Dernière mise à jour :** 2026-09-03
+**Dernière mise à jour :** 2026-09-04
 **Version publiée :** 2.1.1 · **Branche :** `main`
 **Dépôt :** https://github.com/YoannBna/crimson_boris
 **Opérateur :** Yoann — échanges en français, réponses en français.
@@ -288,6 +288,9 @@ BORIS_SELFTEST=1       rapport d'état ; REQUIS pour les captures
 BORIS_SHOT=<png>       capture de la fenêtre réelle, hors champ
 BORIS_SHOT_JS=<js>     pilote la page avant la capture (async accepté)
 BORIS_SHOT_CLICK · BORIS_SHOT_SCROLL · BORIS_SHOT_ANCHOR
+BORIS_SHOT_SIZE=2200x1300   eprouve la mise en page sur un ecran plus grand
+                            que celui de la machine (emulation CDP, pas
+                            setBounds : macOS borne une fenetre au bureau)
 BORIS_MTG_TEST=<file>  banc d'essai deck
 BORIS_FORGE_TEST=<txt> banc d'essai directives
 BORIS_UPDATE_URL       manifeste de mise à jour
@@ -425,6 +428,13 @@ Bundle : CSS 109 → 62 ko, JS 819 → 705 ko.
   libre : l'avatar s'y ancre.
 - **Échap est en phase de capture dans l'inspecteur et le profil** : sinon
   fermer une carte ferait aussi quitter la Forge.
+- **L'aperçu au survol reste dans la colonne du deck.** Ses deux bords sont
+  bornés par ceux de `.forge-deck`, et il se pose du côté opposé à la ligne
+  survolée. Il masquait auparavant les trois volets d'analyse.
+- **Les volets Opti suivent la fenêtre** — `min(100%, max(1200px, 76vw))` —
+  au lieu de plafonner. Bord à bord aurait rempli l'espace mais perdu le
+  centrage ; un plafond fixe garde le centrage mais gaspille l'espace.
+  La prose garde une longueur de ligne en `ch`, pas en pixels.
 - **Vérifier dans l'application empaquetée, pas seulement compiler.**
 
 ---
@@ -470,14 +480,13 @@ Bundle : CSS 109 → 62 ko, JS 819 → 705 ko.
 
 ## 8 · PROCHAINES ÉTAPES
 
-### 8.1 Retouches visuelles annoncées par l'opérateur
-L'état actuel lui convient dans l'ensemble ; il souhaite retravailler
-l'interface plus tard. Deux points déjà identifiés :
+### 8.1 Retouches visuelles
+1. ~~L'aperçu au survol recouvre le volet de droite~~ — **fait le 2026-09-04.**
+2. ~~Les volets Opti laissent trop de blanc sur grand écran~~ — **fait le
+   2026-09-04.**
 
-1. **L'aperçu au survol recouvre le volet de droite** dans la Forge. Il sort
-   par le bord droit de la colonne du deck et empiète sur les volets.
-2. **Les volets Opti à une seule colonne laissent beaucoup de blanc** sur grand
-   écran (`.opti-panneau` plafonne à 1080 px centrés).
+L'état actuel convient à l'opérateur dans l'ensemble ; d'autres retouches
+viendront. Rien d'autre n'est en attente de ce côté.
 
 ### 8.2 Dette
 3. ~~Retirer l'ancienne interface~~ — **fait le 2026-09-03.**

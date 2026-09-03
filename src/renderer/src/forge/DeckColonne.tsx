@@ -54,6 +54,8 @@ interface Apercu {
 
 const APERCU_L = 232
 const APERCU_H = 324
+/** Retrait entre la carte tiree et le bord de la colonne. */
+const MARGE = 14
 
 function DeckCharge({
   deck,
@@ -84,18 +86,34 @@ function DeckCharge({
    */
   const tirer = (card: Card, cible: HTMLElement): void => {
     const r = cible.getBoundingClientRect()
-    /*
-     * Horizontalement, la carte sort par le bord du volet, pas par le
-     * bord de la ligne : posee contre la ligne, elle recouvrait la
-     * seconde colonne de noms — celle que l'oeil est justement en train
-     * de parcourir. Verticalement, elle reste a hauteur de sa ligne :
-     * c'est ce qui rend le lien lisible.
-     */
     const paquet = cible.closest('.forge-deck')?.getBoundingClientRect() ?? r
-    const aDroite = paquet.right + 14 + APERCU_L < window.innerWidth - 8
+
+    /*
+     * La carte reste DANS la colonne du deck.
+     *
+     * Elle sortait auparavant par le bord droit du volet et se posait
+     * sur les trois volets d'analyse, qu'elle masquait entierement. Ses
+     * deux bords sont desormais bornes par ceux de la colonne : quoi
+     * qu'il arrive elle ne deborde plus sur le reste du poste.
+     */
+    const gauche = paquet.left + MARGE
+    const droite = paquet.right - APERCU_L - MARGE
+
+    /*
+     * A l'interieur de cette borne, elle se pose du cote OPPOSE a la
+     * ligne survolee. La liste tient sur deux colonnes de noms : se
+     * poser du meme cote recouvrirait justement celle que l'oeil est en
+     * train de parcourir.
+     */
+    const milieu = paquet.left + paquet.width / 2
+    const voulu = r.left + r.width / 2 < milieu ? droite : gauche
+
     setApercu({
       card,
-      x: aDroite ? paquet.right + 14 : paquet.left - APERCU_L - 14,
+      // `max` en dernier : sur une colonne trop etroite pour la carte,
+      // mieux vaut deborder a droite — vers le volet — que de sortir de
+      // l'ecran par la gauche.
+      x: Math.max(gauche, Math.min(voulu, droite)),
       y: Math.min(Math.max(8, r.top - APERCU_H / 2 + r.height / 2), window.innerHeight - APERCU_H - 8)
     })
   }

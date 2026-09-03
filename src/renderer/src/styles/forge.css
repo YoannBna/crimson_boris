@@ -687,9 +687,22 @@
   z-index: 20; display: flex; justify-content: center;
   animation: ouvre-forge .5s cubic-bezier(.22, 1, .36, 1) both;
 }
+/*
+ * Largeur adaptative.
+ *
+ * Le volet plafonnait a 1080 px : au-dela, tout l'ecran gagne se
+ * transformait en marge. Il suit desormais la fenetre — 76 % de sa
+ * largeur, jamais moins de 1200 px, jamais plus que la place
+ * disponible — et reste centre. Bord a bord aurait rempli l'espace
+ * mais perdu le centrage ; un plafond fixe garde le centrage mais
+ * gaspille l'espace. Ces trois bornes tiennent les deux.
+ *
+ * Ce sont les blocs de prose, plus bas, qui gardent une longueur de
+ * ligne lisible : elargir la colonne ne doit pas etirer les phrases.
+ */
 .opti-panneau {
   display: flex; flex-direction: column; min-height: 0; overflow: hidden;
-  width: min(1080px, 100%); padding: 16px 20px; margin: 0;
+  width: min(100%, max(1200px, 76vw)); padding: 16px 20px; margin: 0;
 }
 .opti-head {
   flex: 0 0 auto; display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
@@ -781,6 +794,18 @@
 .tache-e { flex: 0 0 auto; font-size: 9.5px; color: var(--pure-soft) }
 .due-crit { color: #FF8A94 }
 .due-hot { color: var(--ember-lit) }
+
+/*
+ * Longueur de ligne de la prose, mesuree en caracteres et non en
+ * pixels : c'est l'oeil qui decroche au-dela d'une certaine largeur,
+ * pas la mise en page. Les grilles et les tableaux, eux, profitent de
+ * toute la place.
+ */
+.opti-corps .j-body,
+.opti-corps .vp-note,
+.opti-corps .vp-r,
+.opti-corps .jv-legal { max-width: 92ch }
+.opti-corps .asy-lv { max-width: 104ch }
 
 .opti-corps .vp::-webkit-scrollbar { width: 5px }
 .opti-corps .vp::-webkit-scrollbar-thumb { background: rgba(139, 69, 199, .4) }
