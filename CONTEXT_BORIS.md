@@ -11,7 +11,7 @@
 > demandes en cours et les priorités suivantes.
 
 **Dernière mise à jour :** 2026-09-04 (courbes douces + hook)
-**Version publiée :** 2.1.1 · **Branche :** `main`
+**Version publiée :** 2.1.2 · **Branche :** `main`
 **Dépôt :** https://github.com/YoannBna/crimson_boris
 **Opérateur :** Yoann — échanges en français, réponses en français.
 
@@ -527,13 +527,22 @@ viendront. Rien d'autre n'est en attente de ce côté.
 
 ### 8.2 Dette
 3. ~~Retirer l'ancienne interface~~ — **fait le 2026-09-03.**
-4. **Éprouver le workflow de publication corrigé** au prochain vrai changement
-   de code : vérifier les trois jobs verts et les six paquets. Les deux
-   correctifs (tag annoté, release ouverte une fois) n'ont pas encore tourné
-   sur une publication réelle.
+4. ~~Éprouver le workflow de publication corrigé~~ — **fait le 2026-09-03.**
+   La 2.1.2 est sortie avec trois jobs verts et les six paquets ; le tag est
+   bien annoté et aucune course n'a eu lieu à la création de la release.
 
-### 8.3 Non commencé
-5. Aucun nouveau sous-projet n'est ouvert. Les demandes futures viendront de
+### 8.3 Dette connue, non traitée
+5. **Cinq alertes Dependabot** — `fast-uri` (4, haute) et `@xmldom/xmldom`
+   (1, moyenne), toutes transitives d'`electron-builder`. **Aucune n'est
+   embarquée** dans les installeurs : `dependencies` ne contient que
+   `better-sqlite3`, `electron-updater`, `react`, `react-dom` et les deux
+   `@electron-toolkit`. Le code vulnérable lit `electron-builder.yml` et écrit
+   des `Info.plist` — il n'analyse aucune entrée hostile ici. Remonter
+   `electron-builder` casserait potentiellement une chaîne de publication tout
+   juste réparée : à traiter sur une publication dédiée, pas en passant.
+
+### 8.4 Non commencé
+6. Aucun nouveau sous-projet n'est ouvert. Les demandes futures viendront de
    l'opérateur ; les inscrire ici dès leur formulation.
 
 ---
