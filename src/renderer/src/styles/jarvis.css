@@ -45,9 +45,13 @@
   --r:   16px;
   --r-s: 10px;
   --r-l: 24px;
-  --r-int:   15px;
-  --r-int-s:  9px;
-  --r-int-l: 23px;
+  /* Derives, jamais saisis : le calque interieur suit son rayon
+     exterieur. Ecrits en dur, les trois valeurs se seraient
+     desolidarisees a la premiere retouche de `--r`, et la corne de
+     metal serait revenue sans qu'on sache d'ou. */
+  --r-int:   calc(var(--r) - 1px);
+  --r-int-s: calc(var(--r-s) - 1px);
+  --r-int-l: calc(var(--r-l) - 1px);
 
   /* --- Fonte ---------------------------------------------- */
   --mono: "SF Mono", ui-monospace, "JetBrains Mono", Menlo, Consolas, monospace;
