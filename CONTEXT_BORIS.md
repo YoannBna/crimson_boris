@@ -152,7 +152,22 @@ démarrage** est en surveillance seulement. (Il n'y a pas de cinquième règle.)
 **macOS n'est pas signé** (pas de certificat Apple Developer ID) : la mise à
 jour en place est impossible, le bouton ouvre la page des versions.
 
-### 2.10 Hook de vérification avant commit
+### 2.10 Secrets locaux — `.env`
+
+Un fichier `.env` à la racine, **non versionné** (`.gitignore:22`, vérifié par
+`git check-ignore`), permissions `600`. Il contient aujourd'hui une seule
+entrée, `FIRECRAWL_API_KEY`, déposée le 2026-09-04 sur demande de l'opérateur.
+
+**Aucun code ne la lit encore** : ni le process principal, ni le renderer.
+C'est une clé posée en prévision d'un usage à venir, pas une dépendance.
+Ne jamais recopier sa valeur ici — ce fichier-ci est versionné et poussé.
+
+À ne pas confondre avec les identifiants des connecteurs (courrier, marchés,
+Archidekt), qui ne passent pas par `.env` : ceux-là sont chiffrés par le
+trousseau du système via `safeStorage` et n'ont aucun chemin de relecture vers
+l'interface (§ 2.4).
+
+### 2.11 Hook de vérification avant commit
 
 `.githooks/pre-commit`, versionné, activé par `git config core.hooksPath .githooks`
 (à refaire après un clone). Il compile, passe la suite, et **bloque le commit
