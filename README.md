@@ -268,16 +268,13 @@ src/
 ├─ shared/      contrat main <-> renderer
 └─ renderer/
    └─ src/
-      ├─ styles/      tokens.css + base.css + modules.css (ancienne interface)
-      │               jarvis.css + forge.css + shell.css (coquille)
-      ├─ components/  primitives reutilisables + avatar + aura
+      ├─ styles/      jarvis.css (socle + palette) + forge.css + shell.css
+      ├─ components/  avatar · aura · champs de connecteur · panneau de MAJ
       ├─ nav/         carte des constellations
       ├─ forge/       mode Forge : deck, trois volets, inspection, arts
       ├─ opti/        mode Opti : marches, veille, courrier, actions, asymetries
       ├─ shell/       porte d'entree, profil, version, etat du noyau
-      ├─ data/        contenu et jeux de donnees des modules
-      ├─ modules/     M01 Actualites · M02 Radar · M03 Courrier · M04 Arsenal
-      │               (ancienne interface, atteignable par ?legacy)
+      ├─ data/        asymetries + modeles de reponse
       └─ lib/         hooks
 legacy/          version v1 monofichier, conservee pour reference
 scripts/         outillage (capture de controle)
@@ -296,19 +293,16 @@ Le mode Forge occupe l'ecran : le deck a gauche, un volet a trois modes a droite
 carte la sort du paquet ; cliquer ouvre son inspection et la liste de ses
 impressions avec leurs prix.
 
-L'ancienne interface — bandeau et quatre modules empiles — reste atteignable :
-
-```
-BORIS_LEGACY=1 npx electron out/main/index.js    # ou ?legacy dans l'URL
-```
-
-Elle sera retiree quand la coquille aura tourne quelques versions sans manque.
+L'ancienne interface — bandeau et quatre modules empiles — a ete retiree :
+elle n'avait plus de role apres la bascule, et deux jeux de feuilles de style
+concurrents finissaient par se marcher dessus.
 
 ## Design system
 
-Palette definie dans `src/renderer/src/styles/tokens.css` — source unique.
-Fond abyssal `#121010`, texte `#F8F8F8`, accents sang / braise / pourpre,
-jade reserve aux statuts positifs et aux donnees financieres en hausse.
+Palette definie dans `src/renderer/src/styles/jarvis.css` — source unique, avec
+le socle typographique et les decoupes octogonales.
+Fond `#08070A`, texte blanc pur, mauve `#6B2D8E` et braise `#E8590C` en accents,
+vert reserve aux statuts positifs et aux donnees financieres en hausse.
 
 ## Etat d'avancement
 

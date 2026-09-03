@@ -65,7 +65,7 @@ export function Porte({
   const [nom, setNom] = useState(config.profile.displayName)
 
   return (
-    <div className="jarvis jv-porte jv-skin">
+    <div className="jarvis jv-porte">
       <Aura />
 
       <div className="jv-p-feuille oct">

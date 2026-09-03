@@ -10,8 +10,8 @@
 > refléter l'état exact du projet, l'arborescence, ce qui est validé, les
 > demandes en cours et les priorités suivantes.
 
-**Dernière mise à jour :** 2026-08-30
-**Version publiée :** 2.1.1 · **Commit :** `6219490` · **Branche :** `main`
+**Dernière mise à jour :** 2026-09-03
+**Version publiée :** 2.1.1 · **Branche :** `main`
 **Dépôt :** https://github.com/YoannBna/crimson_boris
 **Opérateur :** Yoann — échanges en français, réponses en français.
 
@@ -62,6 +62,9 @@ src/preload/    pont contextBridge, typé, exposé sous window.boris
 src/renderer/   React ; aucune requête réseau sortante (CSP)
 src/shared/     contrat de types partagé main ↔ renderer
 ```
+
+**Il n'y a plus qu'une interface.** L'ancienne (bandeau + quatre modules
+empilés) et le drapeau `?legacy` ont été retirés le 2026-09-03.
 
 **CSP du renderer** (`src/main/index.ts`) : `default-src 'self'`,
 `connect-src 'self'`, `img-src 'self' data: https://cards.scryfall.io`
@@ -173,7 +176,7 @@ src/shared/               CONTRAT PARTAGÉ
 
 src/main/                 PROCESS PRINCIPAL
   index.ts                orchestration, IPC, modes diagnostic
-  window.ts               fenêtre + CSP + drapeau BORIS_LEGACY
+  window.ts               fenêtre + CSP
   tray.ts · trayIcon.ts   barre de menus
   scheduler.ts            minuteur de cycle
   power.ts                détection de réveil
@@ -191,10 +194,8 @@ src/main/                 PROCESS PRINCIPAL
 src/preload/index.ts      pont contextBridge
 
 src/renderer/src/
-  main.tsx                monte JarvisShell par défaut, App si ?legacy
-  JarvisShell.tsx         COQUILLE ACTUELLE — 3 profondeurs, barre haute
-  App.tsx                 ancienne interface (?legacy), conservée temporairement
-  Onboarding.tsx · Settings.tsx   accueil et réglages de l'ancienne interface
+  main.tsx                monte JarvisShell — point d'entrée unique
+  JarvisShell.tsx         COQUILLE — 3 profondeurs, barre haute
 
   nav/
     map.ts                MODES, angles choisis à la main, nodePosition()
@@ -225,13 +226,16 @@ src/renderer/src/
     EtatCycle.tsx         relance manuelle + gravité + signaux
 
   components/             Aura · BorisAvatar · ConnectorFields · UpdateModal
-                          SyncBadge · primitives · DistBars · LiveQuotes · CopyBlock
+                          (les quatre seuls survivants — le reste servait
+                           l'ancienne interface)
   lib/                    useBoris · useConfig · useMtg · useForge · useArts
-  data/                   asymmetries · markets · mail · deck
-  modules/                M01…M04 + sous-panneaux (ancienne interface)
+  data/                   asymmetries · mail
   styles/
-    tokens.css · base.css · modules.css      ancienne interface
-    jarvis.css · forge.css · shell.css       coquille actuelle
+    jarvis.css            socle (reset, fonte, palette, octogones) + aura
+                          + avatar + constellations
+    forge.css             mode Forge + mode Opti
+    shell.css             barre haute, porte, profil, champs de connecteur,
+                          panneau de mise à jour
 ```
 
 ### 3.2 Fonctionnalités validées
@@ -286,8 +290,16 @@ BORIS_SHOT_JS=<js>     pilote la page avant la capture (async accepté)
 BORIS_SHOT_CLICK · BORIS_SHOT_SCROLL · BORIS_SHOT_ANCHOR
 BORIS_MTG_TEST=<file>  banc d'essai deck
 BORIS_FORGE_TEST=<txt> banc d'essai directives
-BORIS_LEGACY=1         rouvre l'ancienne interface
 BORIS_UPDATE_URL       manifeste de mise à jour
+```
+
+**Piège :** si l'application empaquetée tourne, elle tient le verrou d'instance
+unique et tout `npx electron out/main/index.js` **sort en silence, sans une
+ligne de log**. Lancer les diagnostics sur un profil jetable :
+
+```bash
+mkdir -p /tmp/verif && cp "$HOME/Library/Application Support/Crimson Boris/boris.db" /tmp/verif/
+npx electron out/main/index.js --hidden --user-data-dir=/tmp/verif
 ```
 
 ---
@@ -374,8 +386,12 @@ validée laisse la place à la suivante.
 | — | Porte, profil, version | **livré** |
 | — | Bascule | **faite** — la coquille est l'interface par défaut |
 
-**L'ancienne interface reste atteignable par `?legacy` / `BORIS_LEGACY=1`.**
-Elle sera retirée quand la coquille aura tourné quelques versions sans manque.
+**L'ancienne interface a été retirée** le 2026-09-03 : `App.tsx`,
+`Onboarding.tsx`, `Settings.tsx`, `modules/`, `base.css`, `modules.css`,
+`tokens.css`, le drapeau `?legacy` / `BORIS_LEGACY`, et le code devenu mort avec
+eux (`SyncBadge`, `primitives`, `DistBars`, `LiveQuotes`, `CopyBlock`,
+`ModuleSection`, `data/deck.ts`, `data/markets.ts`).
+Bundle : CSS 109 → 62 ko, JS 819 → 705 ko.
 
 ---
 
@@ -389,13 +405,11 @@ Elle sera retirée quand la coquille aura tourné quelques versions sans manque.
   et le contenu.
 - **`clip-path` rogne même les descendants `position: fixed`** → l'aperçu au
   survol et l'inspecteur sont rendus par portail dans `document.body`.
-- **`base.css` habille tout `<header>` et tout `<section>`** (ancienne
-  interface) : les en-têtes de la coquille remettent à zéro dans `forge.css`,
-  les volets posent `margin: 0`.
 - **`ConnectorFields` et `UpdateModal` ne sont jamais dupliqués.** Le premier
   est le seul endroit du projet où un secret est saisi ; le second porte la
-  règle qui décide de ce qui s'affiche selon la plateforme. Ils sont rhabillés
-  par `.jv-skin`, pas recopiés.
+  règle qui décide de ce qui s'affiche selon la plateforme. Leurs classes
+  (`.onb-*`, `.cf-*`, `.btn`, `.upd-*`) vivent dans `shell.css` : on rhabille,
+  on ne recopie pas.
 - **L'art est rangé hors du deck** (`card_arts`) : un deck enregistré est un
   instantané, revenir en arrière ne doit pas défaire un choix graphique.
   L'art passe dans l'export sous la forme `(SET) numéro`.
@@ -436,7 +450,8 @@ Elle sera retirée quand la coquille aura tourné quelques versions sans manque.
 - Panneaux de la Forge invisibles sans deck (conditionnés sur `hasBridge && deck`).
 - Salutation jamais affichée (état React redondant perdu au remontage).
 - Établi poussé sous la ligne de flottaison par un conteneur qui défilait.
-- Bandeau rouge de `base.css` hérité sur tous les en-têtes de la coquille.
+- Bandeau rouge de `base.css` hérité sur tous les en-têtes de la coquille
+  (défaut disparu avec la feuille elle-même).
 - Impressions sans cote placées en tête d'une liste annoncée croissante.
 - Pastille des connecteurs rognée par le `clip-path` du bouton.
 
@@ -464,12 +479,12 @@ l'interface plus tard. Deux points déjà identifiés :
 2. **Les volets Opti à une seule colonne laissent beaucoup de blanc** sur grand
    écran (`.opti-panneau` plafonne à 1080 px centrés).
 
-### 8.2 Dette assumée
-3. **Retirer l'ancienne interface** (`App.tsx`, `Onboarding.tsx`,
-   `Settings.tsx`, `modules/`, `base.css`, `modules.css`, `tokens.css`,
-   drapeau `?legacy`) quand la coquille aura fait ses preuves.
-4. **Éprouver le workflow corrigé** au prochain vrai changement de code :
-   vérifier les trois jobs verts et les six paquets.
+### 8.2 Dette
+3. ~~Retirer l'ancienne interface~~ — **fait le 2026-09-03.**
+4. **Éprouver le workflow de publication corrigé** au prochain vrai changement
+   de code : vérifier les trois jobs verts et les six paquets. Les deux
+   correctifs (tag annoté, release ouverte une fois) n'ont pas encore tourné
+   sur une publication réelle.
 
 ### 8.3 Non commencé
 5. Aucun nouveau sous-projet n'est ouvert. Les demandes futures viendront de
@@ -492,7 +507,8 @@ BORIS_SELFTEST=1 BORIS_SHOT=/tmp/x.png \
   BORIS_SHOT_JS='(async()=>{ /* pilotage */ })()' \
   npx electron out/main/index.js --hidden
 
-BORIS_LEGACY=1 npx electron out/main/index.js   # ancienne interface
+# Diagnostics : profil jetable si l'application empaquetee tourne
+npx electron out/main/index.js --hidden --user-data-dir=/tmp/verif
 ```
 
 **Publication :** pousser sur `main` suffit. Ne jamais pousser sans demande

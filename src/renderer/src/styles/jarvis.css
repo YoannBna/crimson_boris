@@ -57,7 +57,40 @@
     calc(100% - var(--cut-l)) 100%, var(--cut-l) 100%,
     0% calc(100% - var(--cut-l)), 0% var(--cut-l)
   );
+
+  /* --- Fonte ---------------------------------------------- */
+  --mono: "SF Mono", ui-monospace, "JetBrains Mono", Menlo, Consolas, monospace;
 }
+
+/* ============================================================
+   SOCLE
+   Remise a zero et typographie. Reprises de l'ancienne feuille
+   de base au moment de son retrait, transposees dans la palette
+   de la coquille : elle est desormais la seule.
+   ============================================================ */
+* { box-sizing: border-box; margin: 0; padding: 0 }
+
+html, body, #root { height: 100% }
+
+body {
+  background: var(--void);
+  color: var(--pure);
+  font-family: var(--mono);
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection { background: rgba(232, 89, 12, .45); color: var(--pure) }
+
+::-webkit-scrollbar { width: 10px; height: 10px }
+::-webkit-scrollbar-track { background: var(--void-2) }
+::-webkit-scrollbar-thumb {
+  background: rgba(139, 69, 199, .35);
+  border: 2px solid var(--void-2); border-radius: 6px;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(232, 89, 12, .55) }
 
 /* ============================================================
    FOND ANIME

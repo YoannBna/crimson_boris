@@ -15,8 +15,7 @@ import { UpdateModal } from '@/components/UpdateModal'
  * Le panneau de mise a jour n'est pas reecrit : il porte la decision de
  * ce qui s'affiche selon la plateforme — telecharger sous Windows,
  * ouvrir la page des versions sous macOS faute de signature. Deux
- * copies de cette regle auraient fini par diverger. Il est seulement
- * rhabille, dans `.jv-skin`.
+ * copies de cette regle auraient fini par diverger.
  */
 
 const LABEL: Record<SyncState, string> = {
@@ -123,16 +122,14 @@ export function Version() {
       )}
 
       {modal && (
-        <div className="jv-skin">
-          <UpdateModal
-            info={info}
-            busy={busy}
-            onDownload={() => void act(() => window.boris.downloadUpdate())}
-            onInstall={() => void act(() => window.boris.installUpdate())}
-            onOpenReleases={() => void act(() => window.boris.openReleases())}
-            onClose={() => setModal(false)}
-          />
-        </div>
+        <UpdateModal
+          info={info}
+          busy={busy}
+          onDownload={() => void act(() => window.boris.downloadUpdate())}
+          onInstall={() => void act(() => window.boris.installUpdate())}
+          onOpenReleases={() => void act(() => window.boris.openReleases())}
+          onClose={() => setModal(false)}
+        />
       )}
     </div>
   )

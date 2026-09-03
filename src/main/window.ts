@@ -53,15 +53,10 @@ export function createWindow(show: boolean): BrowserWindow {
     if (process.platform === 'darwin') app.dock?.hide()
   })
 
-  // `BORIS_LEGACY` rouvre l'ancienne interface, conservee le temps de
-  // quelques versions. Sans lui, c'est la coquille qui se monte.
-  const query = process.env['BORIS_LEGACY'] ? { search: '?legacy' } : {}
-
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    const url = process.env['ELECTRON_RENDERER_URL'] + (query.search ?? '')
-    void win.loadURL(url)
+    void win.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
-    void win.loadFile(join(__dirname, '../renderer/index.html'), query)
+    void win.loadFile(join(__dirname, '../renderer/index.html'))
   }
 
   return win

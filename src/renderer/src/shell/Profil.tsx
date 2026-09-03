@@ -7,11 +7,10 @@ import { ConnectorFields } from '@/components/ConnectorFields'
    ============================================================ */
 
 /**
- * La saisie des identifiants passe par `ConnectorFields`, le composant
- * de l'ancienne interface. Il n'est pas reecrit : c'est le seul endroit
- * du projet ou un secret est saisi, et le dupliquer pour un habillage
- * different est exactement ce qui finit par laisser un mot de passe en
- * clair dans la copie oubliee. Il est rhabille par `.jv-skin`.
+ * La saisie des identifiants passe par `ConnectorFields`. Il n'est pas
+ * reecrit : c'est le seul endroit du projet ou un secret est saisi, et
+ * le dupliquer est exactement ce qui finit par laisser un mot de passe
+ * en clair dans la copie oubliee.
  */
 
 const CONNECTEURS: { id: ConnectorId; titre: string; role: string }[] = [
@@ -65,7 +64,7 @@ export function Profil({
   const relies = config.connectors.filter((c) => c.state === 'configure').length
 
   return (
-    <div className="jv-voile jv-skin" onClick={onFermer}>
+    <div className="jv-voile" onClick={onFermer}>
       <div className="jv-feuille oct" onClick={(e) => e.stopPropagation()}>
         <header className="jv-f-head">
           <span className="j-title">Profil &amp; parametres</span>
