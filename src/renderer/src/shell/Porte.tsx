@@ -68,7 +68,7 @@ export function Porte({
     <div className="jarvis jv-porte">
       <Aura />
 
-      <div className="jv-p-feuille oct">
+      <div className="jv-p-feuille cadre">
         <header className="jv-p-head">
           <BorisAvatar size={104} />
           <div className="jv-p-titre">
@@ -129,7 +129,7 @@ export function Porte({
                 />
 
                 {etat !== 'configure' && (
-                  <button className="oct-btn" onClick={() => onSkip(c.id)} disabled={busy}>
+                  <button className="bouton" onClick={() => onSkip(c.id)} disabled={busy}>
                     Passer pour l’instant
                   </button>
                 )}
@@ -147,7 +147,7 @@ export function Porte({
             Rien n’est definitif : tout se modifie ensuite depuis <b>Profil &amp; parametres</b>,
             accessible en permanence.
           </span>
-          <button className="oct-btn oct-btn-warm" onClick={onComplete} disabled={busy}>
+          <button className="bouton bouton-chaud" onClick={onComplete} disabled={busy}>
             {busy ? 'Enregistrement…' : 'Entrer'}
           </button>
         </footer>

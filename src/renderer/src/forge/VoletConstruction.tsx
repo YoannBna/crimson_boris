@@ -168,7 +168,7 @@ export function VoletConstruction({
                 </label>
               </div>
               <button
-                className="oct-btn"
+                className="bouton"
                 disabled={Boolean(busy) || requete.trim() === ''}
                 onClick={() =>
                   onSearch(requete, legalOnly, maxPrix === '' ? undefined : Number(maxPrix))
@@ -232,7 +232,7 @@ export function VoletConstruction({
               onChange={(e) => setTexte(e.target.value)}
             />
             <button
-              className="oct-btn"
+              className="bouton"
               disabled={Boolean(busy) || texte.trim() === ''}
               onClick={() => onPlan(texte)}
             >
@@ -253,7 +253,7 @@ export function VoletConstruction({
                 ))}
                 {plan.changes.length > 0 && (
                   <button
-                    className="oct-btn oct-btn-warm"
+                    className="bouton bouton-chaud"
                     disabled={Boolean(busy)}
                     onClick={() =>
                       onCommit(
@@ -369,7 +369,7 @@ function Auto({
             proposer des cartes sans savoir ce qui manque reviendrait a deviner.
           </p>
         ) : Object.keys(suggestions).length === 0 ? (
-          <button className="oct-btn oct-btn-warm" disabled={Boolean(busy)} onClick={onSuggestions}>
+          <button className="bouton bouton-chaud" disabled={Boolean(busy)} onClick={onSuggestions}>
             {busy ?? 'Chercher des cartes pour combler les failles'}
           </button>
         ) : (
@@ -517,13 +517,13 @@ function Etabli({
       )}
 
       <div className="vce-actions">
-        <button className="oct-btn" onClick={onClear} disabled={Boolean(busy) || vide}>
+        <button className="bouton" onClick={onClear} disabled={Boolean(busy) || vide}>
           Vider
         </button>
-        <button className="oct-btn" onClick={onExport} disabled={Boolean(busy) || vide}>
+        <button className="bouton" onClick={onExport} disabled={Boolean(busy) || vide}>
           Exporter
         </button>
-        <button className="oct-btn oct-btn-warm" onClick={onApply} disabled={Boolean(busy) || vide}>
+        <button className="bouton bouton-chaud" onClick={onApply} disabled={Boolean(busy) || vide}>
           {busy ?? 'Valider'}
         </button>
       </div>

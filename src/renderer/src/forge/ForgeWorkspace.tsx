@@ -81,7 +81,7 @@ export function ForgeWorkspace({ noeud }: { noeud: string | null }) {
         onInspecter={setInspecte}
       />
 
-      <section className="oct forge-side">
+      <section className="cadre forge-side">
         <div className="fs-onglets">
           {(Object.keys(TITRES) as Volet[]).map((v) => (
             <button

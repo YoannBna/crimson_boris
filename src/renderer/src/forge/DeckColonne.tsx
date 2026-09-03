@@ -25,7 +25,7 @@ export function DeckColonne({
 }) {
   if (!deck) {
     return (
-      <section className="oct oct-warm forge-deck">
+      <section className="cadre cadre-chaud forge-deck">
         <div className="forge-vide">
           <ForgeLogo size={118} />
           <span className="j-title">Aucune liste chargee</span>
@@ -34,7 +34,7 @@ export function DeckColonne({
             la courbe, la valeur et la base de mana — puis les trois volets a droite se
             remplissent.
           </p>
-          <button className="oct-btn oct-btn-warm" onClick={onImport} disabled={Boolean(busy)}>
+          <button className="bouton bouton-chaud" onClick={onImport} disabled={Boolean(busy)}>
             {busy ?? 'Importer une liste'}
           </button>
         </div>
@@ -121,7 +121,7 @@ function DeckCharge({
   const maxCourbe = Math.max(1, ...stats.courbe)
 
   return (
-    <section className="oct oct-warm forge-deck">
+    <section className="cadre cadre-chaud forge-deck">
       <header className="fd-head">
         <div className="fd-titre">
           <ForgeLogo size={40} />
@@ -196,9 +196,8 @@ function DeckCharge({
 /**
  * La carte sortie du paquet.
  *
- * Rendue dans `document.body` et non dans le volet : le volet porte un
- * `clip-path`, qui rogne ses descendants meme fixes. La carte y serait
- * restee coupee a mi-hauteur, exactement ce qu'elle doit eviter.
+ * Rendue dans `document.body` et non dans le volet : celui-ci rogne ce
+ * qui deborde de lui, et la carte doit justement sortir de la liste.
  */
 function ApercuCarte({ apercu, art }: { apercu: Apercu; art: ChosenArt | undefined }) {
   const image = art?.imageNormal ?? apercu.card.imageNormal

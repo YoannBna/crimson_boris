@@ -58,7 +58,7 @@ export function VoletSimulation({
           </label>
         </div>
         <button
-          className="oct-btn oct-btn-warm"
+          className="bouton bouton-chaud"
           disabled={Boolean(busy)}
           onClick={() => onRun({ opponents, games, seed })}
         >

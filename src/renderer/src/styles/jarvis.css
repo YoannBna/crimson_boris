@@ -1,6 +1,6 @@
 /* ============================================================
    CRIMSON BORIS — SOCLE VISUEL
-   Environnement fluide, organique, formes octogonales
+   Environnement fluide, organique, courbes douces
    ============================================================ */
 
 :root {
@@ -30,33 +30,24 @@
   --glow-ember:  0 0 24px rgba(232, 89, 12, .45);
   --glow-core:   0 0 40px rgba(255, 255, 255, .30);
 
-  /* --- Geometrie octogonale -------------------------------
-   * La coupe reste courte : un octogone franc ferait dur, alors
-   * qu'une entaille de quelques pixels adoucit l'angle sans
-   * effacer la forme. `--cut` se surcharge par composant.
+  /* --- Courbes --------------------------------------------
+   * Trois rayons, et rien d'autre. Les octogones en `clip-path`
+   * ont ete retires : une decoupe polygonale crenele ses arcs a
+   * chaque angle et ouvre un contexte d'empilement dont il fallait
+   * ensuite se defendre. Un rayon de bordure est lisse par le
+   * moteur, s'applique aux ombres et aux fonds, et laisse les
+   * couches animees suivre la courbe d'elles-memes.
+   *
+   * `--r-int` sert aux calques poses a un pixel du bord : un rayon
+   * interieur egal au rayon exterieur laisserait une corne de metal
+   * depasser dans chaque angle.
    */
-  --cut: 10px;
-  --cut-s: 6px;
-  --cut-l: 18px;
-
-  --octo: polygon(
-    var(--cut) 0%, calc(100% - var(--cut)) 0%,
-    100% var(--cut), 100% calc(100% - var(--cut)),
-    calc(100% - var(--cut)) 100%, var(--cut) 100%,
-    0% calc(100% - var(--cut)), 0% var(--cut)
-  );
-  --octo-s: polygon(
-    var(--cut-s) 0%, calc(100% - var(--cut-s)) 0%,
-    100% var(--cut-s), 100% calc(100% - var(--cut-s)),
-    calc(100% - var(--cut-s)) 100%, var(--cut-s) 100%,
-    0% calc(100% - var(--cut-s)), 0% var(--cut-s)
-  );
-  --octo-l: polygon(
-    var(--cut-l) 0%, calc(100% - var(--cut-l)) 0%,
-    100% var(--cut-l), 100% calc(100% - var(--cut-l)),
-    calc(100% - var(--cut-l)) 100%, var(--cut-l) 100%,
-    0% calc(100% - var(--cut-l)), 0% var(--cut-l)
-  );
+  --r:   16px;
+  --r-s: 10px;
+  --r-l: 24px;
+  --r-int:   15px;
+  --r-int-s:  9px;
+  --r-int-l: 23px;
 
   /* --- Fonte ---------------------------------------------- */
   --mono: "SF Mono", ui-monospace, "JetBrains Mono", Menlo, Consolas, monospace;
@@ -149,11 +140,11 @@ body {
 }
 
 /* ============================================================
-   SURFACES OCTOGONALES
+   SURFACES
    ============================================================ */
-.oct {
+.cadre {
   position: relative;
-  clip-path: var(--octo);
+  border-radius: var(--r);
   /* Le conteneur porte la bordure : c'est le degrade lui-meme, revele
    * par un pixel de marge autour du contenu. */
   background: linear-gradient(
@@ -163,17 +154,20 @@ body {
   background-size: 300% 300%;
   animation: onde 9s ease-in-out infinite;
   padding: 18px 20px;
+  /* Le rayon ne rogne que le fond ; sans cela un enfant carre
+     ressortirait dans les angles arrondis. */
+  overflow: hidden;
 }
-.oct::before {
+.cadre::before {
   content: ""; position: absolute; inset: 1px;
-  clip-path: var(--octo);
+  border-radius: var(--r-int);
   background: linear-gradient(160deg, rgba(27, 15, 38, .93), rgba(12, 9, 16, .96));
 }
-.oct > * { position: relative; z-index: 1 }
-.oct.oct-s { clip-path: var(--octo-s) }
-.oct.oct-s::before { clip-path: var(--octo-s) }
-.oct.oct-l { clip-path: var(--octo-l) }
-.oct.oct-l::before { clip-path: var(--octo-l) }
+.cadre > * { position: relative; z-index: 1 }
+.cadre.cadre-s { border-radius: var(--r-s) }
+.cadre.cadre-s::before { border-radius: var(--r-int-s) }
+.cadre.cadre-l { border-radius: var(--r-l) }
+.cadre.cadre-l::before { border-radius: var(--r-int-l) }
 
 
 
@@ -183,14 +177,14 @@ body {
   50%      { background-position: 100% 50% }
 }
 
-.oct-warm {
+.cadre-chaud {
   background: linear-gradient(
     135deg,
     rgba(232, 89, 12, .6), rgba(255, 193, 99, .35), rgba(163, 59, 12, .55)
   );
   background-size: 300% 300%;
 }
-.oct-cold {
+.cadre-froid {
   background: linear-gradient(
     135deg,
     rgba(107, 45, 142, .6), rgba(139, 69, 199, .3), rgba(58, 27, 82, .6)
@@ -207,42 +201,42 @@ body {
  * empiles au meme inset se masquaient l'un l'autre et le liseré ne se
  * voyait nulle part.
  */
-.oct-btn {
+.bouton {
   position: relative; display: inline-flex; align-items: center; gap: 9px;
   font: inherit; font-size: 10px; letter-spacing: .18em; text-transform: uppercase;
   font-weight: 700; color: var(--pure); cursor: pointer;
   padding: 10px 22px; border: none;
-  clip-path: var(--octo-s);
+  border-radius: var(--r-s); overflow: hidden;
   background: linear-gradient(135deg, var(--violet), var(--ember-2), var(--violet));
   background-size: 300% 300%;
   animation: onde 7s ease-in-out infinite;
   transition: transform .2s ease, filter .2s ease;
 }
-.oct-btn::before {
+.bouton::before {
   content: ""; position: absolute; inset: 1px;
-  clip-path: var(--octo-s);
+  border-radius: var(--r-int-s);
   background: linear-gradient(135deg, rgba(34, 19, 48, .96), rgba(14, 11, 18, .97));
   transition: background .2s ease;
 }
-.oct-btn > *, .oct-btn { z-index: 0 }
-.oct-btn { isolation: isolate }
-.oct-btn::before { z-index: -1 }
+.bouton > *, .bouton { z-index: 0 }
+.bouton { isolation: isolate }
+.bouton::before { z-index: -1 }
 
-.oct-btn:hover {
+.bouton:hover {
   transform: translateY(-1px);
   filter: drop-shadow(0 4px 16px rgba(139, 69, 199, .4));
   animation-duration: 2.6s;
 }
-.oct-btn:hover::before {
+.bouton:hover::before {
   background: linear-gradient(135deg, rgba(48, 26, 68, .96), rgba(20, 15, 26, .97));
 }
-.oct-btn:disabled { opacity: .4; cursor: default; transform: none; filter: none }
+.bouton:disabled { opacity: .4; cursor: default; transform: none; filter: none }
 
-.oct-btn-warm {
+.bouton-chaud {
   background: linear-gradient(135deg, var(--ember-2), var(--gold-heat), var(--burnt));
   background-size: 300% 300%;
 }
-.oct-btn-warm:hover { filter: drop-shadow(0 4px 16px rgba(232, 89, 12, .45)) }
+.bouton-chaud:hover { filter: drop-shadow(0 4px 16px rgba(232, 89, 12, .45)) }
 
 
 
@@ -265,16 +259,15 @@ body {
 /*
  * Cadre, pas fond plein.
  *
- * `clip-path` ouvre un contexte d'empilement : un pseudo-element en
- * z-index negatif s'y place entre le fond du parent et son contenu,
- * masquant ce fond au lieu de passer derriere. Le degrade tient donc le
- * conteneur, et le fond sombre est porte par le contenu, decale d'un
- * pixel — ce qui laisse voir le liseré tout autour.
+ * Le degrade tient le conteneur et le fond sombre est porte par le
+ * contenu, ecarte d'un pixel de padding : c'est ce pixel qui fait le
+ * liseré. `overflow: hidden` sur le conteneur suffit a ce que l'enfant
+ * suive la courbe.
  */
 .avatar-hello {
   position: absolute; top: calc(100% - 4px); left: 50%; transform: translateX(-50%);
   white-space: nowrap;
-  clip-path: var(--octo-s);
+  border-radius: var(--r-s); overflow: hidden;
   background: linear-gradient(135deg, var(--violet), var(--ember-2));
   padding: 1px;
   animation: salut 5.2s ease-in-out forwards;
@@ -283,7 +276,7 @@ body {
 }
 .avatar-hello > span {
   display: block; padding: 8px 18px;
-  clip-path: var(--octo-s);
+  border-radius: var(--r-int-s);
   background: linear-gradient(135deg, rgba(20, 12, 28, .97), rgba(12, 9, 16, .98));
   color: var(--pure); font-size: 12px; letter-spacing: .12em;
 }
@@ -375,7 +368,7 @@ body {
   pointer-events: auto; cursor: pointer; border: none; font: inherit;
   display: grid; gap: 4px; justify-items: center; text-align: center;
   padding: 14px 18px; min-width: 132px;
-  clip-path: var(--octo-s);
+  border-radius: var(--r-s);
   background: linear-gradient(135deg, rgba(107, 45, 142, .55), rgba(139, 69, 199, .3));
   transition: transform .3s cubic-bezier(.22, 1, .36, 1), opacity .4s ease,
               background .3s ease, filter .3s ease;
@@ -383,7 +376,7 @@ body {
 }
 .cst-node::before {
   content: ""; position: absolute; inset: 1px; z-index: -1;
-  clip-path: var(--octo-s);
+  border-radius: var(--r-int-s);
   background: linear-gradient(150deg, rgba(24, 14, 34, .94), rgba(12, 9, 16, .96));
 }
 .cst-node { isolation: isolate }

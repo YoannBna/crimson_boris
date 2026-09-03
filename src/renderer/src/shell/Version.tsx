@@ -89,7 +89,7 @@ export function Version() {
       )}
 
       {ouvert && (
-        <div className="jv-detail oct oct-s">
+        <div className="jv-detail cadre cadre-s">
           <Ligne t="Etat" v={LABEL[info.state]} />
           <Ligne t="Version locale" v={info.local} />
           {info.remote && <Ligne t="Version publiee" v={info.remote} />}
@@ -112,7 +112,7 @@ export function Version() {
             <div className="jv-note jv-bloque">{info.autoUpdateBlocker}</div>
           )}
           <button
-            className="oct-btn"
+            className="bouton"
             disabled={busy}
             onClick={() => void window.boris.checkVersion().then(setInfo)}
           >

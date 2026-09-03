@@ -10,7 +10,7 @@
 > refléter l'état exact du projet, l'arborescence, ce qui est validé, les
 > demandes en cours et les priorités suivantes.
 
-**Dernière mise à jour :** 2026-09-04
+**Dernière mise à jour :** 2026-09-04 (courbes douces + hook)
 **Version publiée :** 2.1.1 · **Branche :** `main`
 **Dépôt :** https://github.com/YoannBna/crimson_boris
 **Opérateur :** Yoann — échanges en français, réponses en français.
@@ -152,6 +152,23 @@ démarrage** est en surveillance seulement. (Il n'y a pas de cinquième règle.)
 **macOS n'est pas signé** (pas de certificat Apple Developer ID) : la mise à
 jour en place est impossible, le bouton ouvre la page des versions.
 
+### 2.10 Hook de vérification avant commit
+
+`.githooks/pre-commit`, versionné, activé par `git config core.hooksPath .githooks`
+(à refaire après un clone). Il compile, passe la suite, et **bloque le commit
+dès une seule épreuve en échec**. `git commit --no-verify` passe outre.
+
+Deux garde-fous qui ne sont pas décoratifs :
+
+- il **compile avant** de tester — sans cela la suite éprouverait le bundle
+  précédent, verte sur du code qui n'est pas celui qu'on valide ;
+- il exige la ligne de bilan `===== N reussies, M echouees =====`. **Un bilan
+  absent n'est pas un succès** : c'est une suite qui n'a pas tourné. Electron
+  sort en silence avec le code 0 quand le verrou d'instance unique est déjà
+  pris — le hook passerait sans rien vérifier. Il tourne pour cette raison sur
+  un profil dédié (`.git/boris-hook-profile`), ce qui épargne aussi la vraie
+  base.
+
 ---
 
 ## 3 · ÉTAT ACTUEL DU CODE
@@ -166,6 +183,7 @@ electron.vite.config.ts · vite.web.config.ts
 tsconfig{,.node,.web}.json
 .github/workflows/release.yml
 scripts/screenshot.cjs
+.githooks/pre-commit      verification avant commit
 
 src/shared/               CONTRAT PARTAGÉ
   types.ts                CoreStatus · MarketQuote · Settings · BorisAPI · MtgAPI
@@ -231,7 +249,7 @@ src/renderer/src/
   lib/                    useBoris · useConfig · useMtg · useForge · useArts
   data/                   asymmetries · mail
   styles/
-    jarvis.css            socle (reset, fonte, palette, octogones) + aura
+    jarvis.css            socle (reset, fonte, palette, rayons) + aura
                           + avatar + constellations
     forge.css             mode Forge + mode Opti
     shell.css             barre haute, porte, profil, champs de connecteur,
@@ -335,6 +353,13 @@ et interfaces portent des calques animés avec de légères vagues sur leurs
 bordures démarcatives. Textes fixes en **blanc pur**, contraste parfait sans
 fatigue oculaire.
 
+> **Amendement du 2026-09-04 — les octogones sont abandonnés.**
+> Le brief d'origine demandait des « formes octogonales aux angles légèrement
+> arrondis ». L'opérateur a demandé une interface **totalement fluide et
+> douce** : le système de découpe `clip-path` et ses variables ont été retirés
+> au profit de vrais `border-radius`. **C'est le standard visuel courant** ;
+> toute nouvelle surface s'y conforme.
+
 ### 4.4 Navigation spatiale en constellations
 Choix initial entre **Opti** (finances, mail, productivité) et **Forge**
 (Magic). Chaque mode présente ses sous-catégories en constellation où tout
@@ -371,8 +396,16 @@ validée laisse la place à la suivante.
 --burnt #A33B0C  --ember-2 #E8590C  --ember-lit #FF8A3D  --gold-heat #FFC163
 --blood-2 #C81E2D
 --pure #FFFFFF   --pure-soft .72     --pure-faint .42     --pure-ghost .16
---octo / --octo-s / --octo-l   clip-path octogonaux (--cut 10 / 6 / 18 px)
+--r 16px · --r-s 10px · --r-l 24px            rayons de bordure
+--r-int 15px · --r-int-s 9px · --r-int-l 23px  rayons des calques a 1 px du bord
 ```
+
+**Standard des courbes.** Trois rayons, et rien d'autre. Un cadre prend `--r`,
+un bouton ou une pastille `--r-s`, une grande feuille `--r-l`. Le calque posé à
+un pixel du bord prend le rayon intérieur correspondant : un rayon intérieur
+égal à l'extérieur laisse une corne de métal dépasser dans chaque angle.
+Toute surface qui porte un liseré par dégradé prend `overflow: hidden`, sinon
+un enfant opaque ressort carré dans les angles.
 
 ---
 
@@ -402,12 +435,14 @@ Bundle : CSS 109 → 62 ko, JS 819 → 705 ko.
 
 - **`app.setName('Crimson Boris')` avant `requestSingleInstanceLock()`** — le
   premier accès à `userData` fige le chemin.
-- **Bordure octogonale** : le conteneur porte le dégradé, un pseudo-élément
-  `inset: 1px` porte le fond sombre. Un `clip-path` crée un contexte
-  d'empilement où un enfant en z-index négatif passe *entre* le fond du parent
-  et le contenu.
-- **`clip-path` rogne même les descendants `position: fixed`** → l'aperçu au
-  survol et l'inspecteur sont rendus par portail dans `document.body`.
+- **Liseré par dégradé** : le conteneur porte le dégradé animé, un
+  pseudo-élément `inset: 1px` (ou un `padding: 1px`) porte le fond sombre. Le
+  pixel d'écart *est* la bordure. Ne pas remplacer par un `border` : la vague
+  animée court sur le fond du conteneur, pas sur une bordure.
+- **L'aperçu au survol et l'inspecteur sont rendus par portail** dans
+  `document.body`. Le motif venait d'un `clip-path` qui rognait jusqu'aux
+  descendants fixés ; il reste juste avec `overflow: hidden`, qui rogne de
+  même. Les laisser dans le volet les couperait.
 - **`ConnectorFields` et `UpdateModal` ne sont jamais dupliqués.** Le premier
   est le seul endroit du projet où un secret est saisi ; le second porte la
   règle qui décide de ce qui s'affiche selon la plateforme. Leurs classes
@@ -485,6 +520,8 @@ Bundle : CSS 109 → 62 ko, JS 819 → 705 ko.
 2. ~~Les volets Opti laissent trop de blanc sur grand écran~~ — **fait le
    2026-09-04.**
 
+3. ~~Octogones remplacés par des courbes douces~~ — **fait le 2026-09-04.**
+
 L'état actuel convient à l'opérateur dans l'ensemble ; d'autres retouches
 viendront. Rien d'autre n'est en attente de ce côté.
 
@@ -519,6 +556,9 @@ BORIS_SELFTEST=1 BORIS_SHOT=/tmp/x.png \
 # Diagnostics : profil jetable si l'application empaquetee tourne
 npx electron out/main/index.js --hidden --user-data-dir=/tmp/verif
 ```
+
+**Hook :** actif via `git config core.hooksPath .githooks`. À refaire après un
+clone. `git commit --no-verify` pour passer outre une fois.
 
 **Publication :** pousser sur `main` suffit. Ne jamais pousser sans demande
 explicite de l'opérateur — un push publie une version.

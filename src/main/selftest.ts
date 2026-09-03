@@ -26,10 +26,21 @@ let passed = 0
 let failed = 0
 const failures: string[] = []
 
-/** Derniere version de deck existant avant les epreuves qui en ecrivent. */
-let repereDecks = -1
+/**
+ * Derniere version de deck existant avant les epreuves qui en ecrivent.
+ * `null` = aucun repere pose. La distinction compte : sur une base
+ * vierge le repere vaut -1, ce qui est une valeur parfaitement valide
+ * — la confondre avec « pas de repere » faisait echouer la suite sur
+ * tout profil neuf.
+ */
+let repereDecks: number | null = null
 
-function assert(cond: unknown, message: string): void {
+/*
+ * `asserts cond` plutot que `void` : le compilateur affine le type
+ * apres l'appel, si bien qu'un `assert(x !== null, ...)` suffit a
+ * rendre `x` non nul pour la suite de l'epreuve.
+ */
+function assert(cond: unknown, message: string): asserts cond {
   if (!cond) throw new Error(message)
 }
 
@@ -386,7 +397,7 @@ async function buildCases(): Promise<Case[]> {
 
     // Repere pose avant la premiere ecriture : la derniere epreuve du
     // groupe rendra la pile a cet etat.
-    if (repereDecks < 0) repereDecks = lastDeckId()
+    if (repereDecks === null) repereDecks = lastDeckId()
 
     const deck = fauxDeck(10)
     saveDeck(deck)
@@ -443,15 +454,16 @@ async function buildCases(): Promise<Case[]> {
    */
   add('Forge — etabli', 'les epreuves rendent la pile intacte', async () => {
     const { dropDeckVersionsAfter, lastDeckId, deckVersions } = await import('./store/decks')
-    assert(repereDecks >= 0, 'un repere a bien ete pose')
+    const repere = repereDecks
+    assert(repere !== null, 'un repere a bien ete pose')
     assert(deckVersions()[0]?.name === 'epreuve', 'la tete de pile est bien un deck d’essai')
-    dropDeckVersionsAfter(repereDecks)
-    eq(lastDeckId(), repereDecks, 'la pile revient a son repere')
+    dropDeckVersionsAfter(repere)
+    eq(lastDeckId(), repere, 'la pile revient a son repere')
     assert(
-      !deckVersions().some((v) => v.id > repereDecks),
+      !deckVersions().some((v) => v.id > repere),
       'aucune version d’essai ne subsiste'
     )
-    repereDecks = -1
+    repereDecks = null
   })
 
   /* ---------- Forge : illustrations ----------

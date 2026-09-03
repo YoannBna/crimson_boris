@@ -63,10 +63,10 @@ export function Inspecteur({
     ? `${art.setCode.toUpperCase()} · ${art.collectorNumber}`
     : `${card.setCode.toUpperCase()} · ${card.collectorNumber}`
 
-  // Comme l'apercu : hors du volet, dont le `clip-path` rognerait la vue.
+  // Comme l'apercu : hors du volet, qui rognerait la vue.
   return createPortal(
     <div className="insp-fond" onClick={onFermer}>
-      <div className="insp oct" onClick={(e) => e.stopPropagation()}>
+      <div className="insp cadre" onClick={(e) => e.stopPropagation()}>
         {/* --- Carte, a gauche --- */}
         <div className="insp-carte">
           <div className="insp-visuel">

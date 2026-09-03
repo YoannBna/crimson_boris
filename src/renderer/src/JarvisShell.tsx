@@ -138,7 +138,7 @@ export function JarvisShell() {
           {MODES.map((m) => (
             <button
               key={m.id}
-              className={`mode-card oct oct-${m.tone}`}
+              className={`mode-card cadre cadre-${m.tone}`}
               onClick={() => setMode(m.id)}
             >
               {/* La Forge porte son enseigne ; Opti n'en a pas besoin,
@@ -172,7 +172,7 @@ export function JarvisShell() {
       {/* --- Retour flottant -------------------------------------- */}
       {depth !== 'accueil' && (
         <button
-          className="retour oct-btn"
+          className="retour bouton"
           onClick={(e) => {
             e.stopPropagation()
             remonter()
@@ -192,11 +192,11 @@ export function JarvisShell() {
       <div className="jv-barre" onClick={(e) => e.stopPropagation()}>
         <EtatCycle status={status} />
 
-        {/* La pastille vit hors du bouton : le `clip-path` octogonal de
-            `oct-btn` rogne ses descendants, et elle y perdait un coin. */}
+        {/* La pastille vit hors du bouton : celui-ci rogne ce qui
+            deborde de sa courbe, et elle y perdait un coin. */}
         <span className="jv-profil">
           <button
-            className="jv-profil-btn oct-btn"
+            className="jv-profil-btn bouton"
             onClick={() => setProfil(true)}
             title="Profil et parametres"
           >

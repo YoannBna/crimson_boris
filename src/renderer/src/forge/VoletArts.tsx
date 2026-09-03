@@ -51,7 +51,7 @@ export function VoletArts({
           disponibles sous six euros : sans bordure, pleine page, cadres vitrine. Retenir une
           illustration l'applique au deck et la fait suivre jusque dans l'export.
         </p>
-        <button className="oct-btn oct-btn-warm" disabled={Boolean(busy)} onClick={onCharger}>
+        <button className="bouton bouton-chaud" disabled={Boolean(busy)} onClick={onCharger}>
           {busy ?? 'Chercher des illustrations'}
         </button>
       </Bloc>
@@ -67,7 +67,7 @@ export function VoletArts({
           <p className="j-body">
             File epuisee — {retenues} illustration(s) retenue(s) sur {styles.length} proposees.
           </p>
-          <button className="oct-btn" disabled={Boolean(busy)} onClick={onCharger}>
+          <button className="bouton" disabled={Boolean(busy)} onClick={onCharger}>
             {busy ?? 'Relancer la recherche'}
           </button>
         </>

@@ -85,7 +85,7 @@ export function VoletAnalyse({
             </div>
           ))
         )}
-        <button className="oct-btn" onClick={onRelire} disabled={Boolean(busy)}>
+        <button className="bouton" onClick={onRelire} disabled={Boolean(busy)}>
           {busy ?? 'Relire la liste'}
         </button>
       </Bloc>

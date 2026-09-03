@@ -58,13 +58,13 @@
    COLONNE DU DECK
    ============================================================ */
 .forge-vide { display: grid; gap: 14px; place-content: center; text-align: center; height: 100% }
-.forge-vide .oct-btn { justify-self: center }
+.forge-vide .bouton { justify-self: center }
 
 .fd-head { flex: 0 0 auto; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,.09) }
 .fd-titre { display: flex; align-items: center; gap: 12px; flex-wrap: wrap }
 .fd-total {
   font-size: 11px; letter-spacing: .12em; font-weight: 700;
-  padding: 3px 9px; clip-path: var(--octo-s);
+  padding: 3px 9px; border-radius: var(--r-s);
 }
 .fd-total.ok { background: rgba(59, 138, 86, .3); color: #9FE0B8 }
 .fd-total.hs { background: rgba(200, 30, 45, .28); color: #FFB3B8 }
@@ -143,7 +143,7 @@
 .fd-nonresolu {
   margin-top: 10px; padding: 8px 10px; font-size: 10.5px;
   color: #FFB3B8; background: rgba(200, 30, 45, .12);
-  clip-path: var(--octo-s);
+  border-radius: var(--r-s);
 }
 
 /* ============================================================
@@ -171,7 +171,7 @@
   flex: 1; font: inherit; font-size: 9.5px; letter-spacing: .16em;
   text-transform: uppercase; font-weight: 700;
   padding: 8px 4px; cursor: pointer; border: none;
-  clip-path: var(--octo-s);
+  border-radius: var(--r-s);
   background: rgba(255, 255, 255, .05); color: var(--pure-faint);
   transition: background .2s ease, color .2s ease;
 }
@@ -190,7 +190,7 @@
 .fs-corps { flex: 1 1 auto; min-height: 0; overflow: hidden; display: flex; flex-direction: column }
 .fs-erreur {
   flex: 0 0 auto; margin-bottom: 8px; padding: 8px 10px; font-size: 11px;
-  color: #FFB3B8; background: rgba(200, 30, 45, .16); clip-path: var(--octo-s);
+  color: #FFB3B8; background: rgba(200, 30, 45, .16); border-radius: var(--r-s);
 }
 
 .vp {
@@ -252,7 +252,7 @@
 .vs-mesure {
   display: flex; flex-direction: column; gap: 2px;
   padding: 8px 10px; background: rgba(255, 255, 255, .04);
-  clip-path: var(--octo-s);
+  border-radius: var(--r-s);
 }
 .vs-mesure b { font-size: 16px; color: var(--pure); font-weight: 700; line-height: 1.1 }
 .vs-mesure i {
@@ -400,7 +400,7 @@
 .vce-verdict { font-size: 10.5px; color: #FFB3B8; line-height: 1.5 }
 .vce-verdict.ok { color: #9FE0B8 }
 .vce-actions { display: flex; gap: 6px }
-.vce-actions .oct-btn { flex: 1; justify-content: center; padding: 8px 6px; font-size: 9px }
+.vce-actions .bouton { flex: 1; justify-content: center; padding: 8px 6px; font-size: 9px }
 .vce-ok { font-size: 10.5px; color: #9FE0B8; line-height: 1.5 }
 
 /* ============================================================
@@ -417,7 +417,7 @@
 .pile-v {
   flex: 0 0 auto; display: grid; gap: 1px; text-align: left;
   font: inherit; cursor: pointer; border: none; padding: 6px 11px;
-  clip-path: var(--octo-s);
+  border-radius: var(--r-s);
   background: rgba(255, 255, 255, .05);
   transition: background .2s ease, transform .2s ease;
 }
@@ -459,8 +459,8 @@
 /* ============================================================
    CARTE TIREE DU PAQUET
    Au survol d'une ligne, la carte sort entierement de la pile.
-   Rendue dans le body : le volet porte un clip-path, qui rognerait
-   une carte pourtant fixee.
+   Rendue dans le body : le volet rogne ce qui deborde de lui, et la
+   carte doit pouvoir sortir de la liste.
    ============================================================ */
 .fd-apercu {
   position: fixed; z-index: 60; pointer-events: none;
@@ -477,7 +477,7 @@
 .fd-apercu-badge {
   position: absolute; right: 10px; top: 10px;
   display: grid; place-items: center; padding: 4px;
-  background: rgba(12, 9, 16, .82); clip-path: var(--octo-s);
+  background: rgba(12, 9, 16, .82); border-radius: var(--r-s);
 }
 
 /* ============================================================
@@ -531,7 +531,7 @@
 .insp-badge {
   position: absolute; right: 12px; top: 12px;
   display: grid; place-items: center; padding: 5px;
-  background: rgba(12, 9, 16, .86); clip-path: var(--octo-s);
+  background: rgba(12, 9, 16, .86); border-radius: var(--r-s);
 }
 .insp-ident { display: flex; align-items: center; gap: 9px; flex-wrap: wrap }
 .insp-type { line-height: 1.4 }
@@ -569,7 +569,7 @@
   position: relative; display: grid; gap: 3px; padding: 7px;
   font: inherit; text-align: left; cursor: pointer; border: none;
   background: rgba(255, 255, 255, .04);
-  clip-path: var(--octo-s);
+  border-radius: var(--r-s);
   transition: background .2s ease, transform .2s ease;
 }
 .insp-imp:hover { background: rgba(232, 89, 12, .22); transform: translateY(-3px) }
@@ -597,7 +597,7 @@
 .va-passer {
   flex: 0 0 auto; font: inherit; font-size: 9px; letter-spacing: .14em;
   text-transform: uppercase; font-weight: 700; padding: 5px 12px;
-  border: none; cursor: pointer; clip-path: var(--octo-s);
+  border: none; cursor: pointer; border-radius: var(--r-s);
   background: rgba(255, 255, 255, .07); color: var(--pure-soft);
 }
 .va-passer:hover { background: rgba(255, 255, 255, .14); color: var(--pure) }
@@ -608,7 +608,7 @@
 .va-carte {
   display: grid; gap: 2px; padding: 6px; font: inherit; text-align: left;
   cursor: pointer; border: none; background: rgba(255, 255, 255, .04);
-  clip-path: var(--octo-s);
+  border-radius: var(--r-s);
   transition: background .2s ease, transform .2s ease;
 }
 .va-carte:hover { background: rgba(232, 89, 12, .26); transform: translateY(-3px) }
@@ -717,7 +717,7 @@
 }
 .cot {
   display: grid; gap: 2px; padding: 9px 11px;
-  background: rgba(255, 255, 255, .04); clip-path: var(--octo-s);
+  background: rgba(255, 255, 255, .04); border-radius: var(--r-s);
 }
 .cot-l { font-size: 9.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--pure-faint) }
 .cot-p { font-size: 17px; font-weight: 700; color: var(--pure) }

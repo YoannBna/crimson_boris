@@ -75,7 +75,7 @@ export function EtatCycle({ status }: { status: CoreStatus | null }) {
       </button>
 
       {ouvert && (
-        <div className="jv-detail oct oct-s">
+        <div className="jv-detail cadre cadre-s">
           <div className="jv-ligne">
             <span>Dernier passage</span>
             <b>

@@ -36,7 +36,7 @@ export function OptiVolet({ noeud }: { noeud: NodeDef | null }) {
 
   return (
     <div className="opti-work" onClick={(e) => e.stopPropagation()}>
-      <section className="oct oct-cold opti-panneau">
+      <section className="cadre cadre-froid opti-panneau">
         <header className="opti-head">
           <span className="j-title">{noeud.label}</span>
           <span className="j-dim">{noeud.role}</span>

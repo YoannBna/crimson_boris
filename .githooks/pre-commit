@@ -1,0 +1,55 @@
+#!/bin/sh
+# ============================================================
+#  Verification avant commit
+#
+#  Compile, puis passe la suite de verification de Boris. Une seule
+#  epreuve en echec bloque la validation.
+#
+#  Pour passer outre une fois — correction de documentation, commit
+#  intermediaire sur une branche de travail :
+#      git commit --no-verify
+# ============================================================
+set -eu
+
+racine=$(git rev-parse --show-toplevel)
+cd "$racine"
+
+printf '\033[35m▸ Boris — verification avant commit\033[0m\n'
+
+# La suite s'execute sur `out/`, pas sur les sources. Sans cette
+# compilation elle eprouverait le bundle precedent : verte sur du code
+# qui n'est pas celui qu'on valide.
+if ! sortie=$(npm run build 2>&1); then
+  printf '\033[31m✗ La compilation echoue — commit bloque.\033[0m\n'
+  printf '%s\n' "$sortie" | tail -25
+  exit 1
+fi
+
+# Profil dedie. Sans lui, la suite tourne sur la vraie base ET se heurte
+# au verrou d'instance unique des que l'application empaquetee tourne :
+# Electron sort alors en silence, code 0, sans avoir rien execute. Le
+# hook passerait sans jamais rien verifier.
+profil="$racine/.git/boris-hook-profile"
+mkdir -p "$profil"
+
+rapport=$(BORIS_TESTS=1 npx electron out/main/index.js --hidden --user-data-dir="$profil" 2>&1) || true
+
+bilan=$(printf '%s\n' "$rapport" | grep -E '^===== [0-9]+ reussies, [0-9]+ echouees =====$' | tail -1)
+
+# Un bilan absent n'est pas un succes : c'est une suite qui n'a pas
+# tourne. C'est le cas le plus dangereux, celui qui laisse passer.
+if [ -z "$bilan" ]; then
+  printf '\033[31m✗ La suite n a pas rendu de bilan — commit bloque.\033[0m\n'
+  printf '%s\n' "$rapport" | tail -25
+  exit 1
+fi
+
+echecs=$(printf '%s\n' "$bilan" | sed -E 's/^===== [0-9]+ reussies, ([0-9]+) echouees =====$/\1/')
+
+if [ "$echecs" != "0" ]; then
+  printf '\033[31m✗ %s\033[0m\n' "$bilan"
+  printf '%s\n' "$rapport" | sed -n '/^   ✗/,$p' | head -40
+  exit 1
+fi
+
+printf '\033[32m✓ %s\033[0m\n' "$bilan"

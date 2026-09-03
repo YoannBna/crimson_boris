@@ -300,9 +300,20 @@ concurrents finissaient par se marcher dessus.
 ## Design system
 
 Palette definie dans `src/renderer/src/styles/jarvis.css` — source unique, avec
-le socle typographique et les decoupes octogonales.
+le socle typographique et les trois rayons de bordure (`--r` 16 px pour les
+cadres, `--r-s` 10 px pour les boutons, `--r-l` 24 px pour les grandes
+feuilles). Aucune decoupe polygonale : les formes sont des courbes.
 Fond `#08070A`, texte blanc pur, mauve `#6B2D8E` et braise `#E8590C` en accents,
 vert reserve aux statuts positifs et aux donnees financieres en hausse.
+
+## Verification avant commit
+
+`.githooks/pre-commit` compile puis passe la suite ; une seule epreuve en echec
+bloque la validation. A activer apres un clone :
+
+```
+git config core.hooksPath .githooks
+```
 
 ## Etat d'avancement
 

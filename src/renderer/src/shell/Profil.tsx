@@ -65,7 +65,7 @@ export function Profil({
 
   return (
     <div className="jv-voile" onClick={onFermer}>
-      <div className="jv-feuille oct" onClick={(e) => e.stopPropagation()}>
+      <div className="jv-feuille cadre" onClick={(e) => e.stopPropagation()}>
         <header className="jv-f-head">
           <span className="j-title">Profil &amp; parametres</span>
           <span className="j-dim">
@@ -160,15 +160,15 @@ export function Profil({
             {purge ? (
               <div className="jv-purge">
                 <span>Cette action ne se defait pas.</span>
-                <button className="oct-btn" onClick={() => setPurge(false)} disabled={busy}>
+                <button className="bouton" onClick={() => setPurge(false)} disabled={busy}>
                   Annuler
                 </button>
-                <button className="oct-btn jv-rouge" onClick={onPurge} disabled={busy}>
+                <button className="bouton jv-rouge" onClick={onPurge} disabled={busy}>
                   {busy ? 'Effacement…' : 'Effacer definitivement'}
                 </button>
               </div>
             ) : (
-              <button className="oct-btn" onClick={() => setPurge(true)} disabled={busy}>
+              <button className="bouton" onClick={() => setPurge(true)} disabled={busy}>
                 Effacer toutes mes donnees
               </button>
             )}
@@ -180,7 +180,7 @@ export function Profil({
             Les identifiants sont chiffres par le trousseau du systeme et ne remontent jamais a
             l’interface — elle sait qu’ils existent, pas ce qu’ils valent.
           </span>
-          <button className="oct-btn" onClick={onFermer}>
+          <button className="bouton" onClick={onFermer}>
             {busy ? 'Enregistrement…' : 'Fermer'}
           </button>
         </footer>
